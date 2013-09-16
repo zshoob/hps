@@ -4,17 +4,14 @@ import java.util.Arrays;
 public class Mint{
   private static double N;
   private static int[] upperDenomination = new int[]{1, 5, 10, 25, 50};
-
   private static double upperBound = 0;
   private static int[] optiDenomination = new int[5];
   private static double optiTotal = 0;
   private static int[] exactChangeNo = new int[100];
-
   private static double upperTotalForExchange = 0;
   private static int[] optiDenominationForExchange = new int[5];
   private static double optiTotalForExchange = 0;
   private static int[] exchangeNo = new int[101];
-
 
   private void calculateUpperTotal(){
     exactChangeNo[0] = 0;
