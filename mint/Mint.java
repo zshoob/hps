@@ -194,14 +194,14 @@ public class Mint{
     System.out.println("TEAM");
     if(choice == 1){
       mint.getOptimDenominationForExact();
-      System.out.printf("%d %d %d %d %d %n", optiDenomination[0], 
+      System.out.printf("%d %d %d %d %d%n", optiDenomination[0], 
         optiDenomination[1], optiDenomination[2], optiDenomination[3], optiDenomination[4]);
-      System.out.printf("%,.2f %n", optiTotal);
+      //System.out.printf("%,.2f %n", optiTotal);
     }else if(choice == 2){
       mint.getOptimDenominationForExchange();
-      System.out.printf("%d %d %d %d %d %n", optiDenominationForExchange[0], 
+      System.out.printf("%d %d %d %d %d%n", optiDenominationForExchange[0], 
         optiDenominationForExchange[1], optiDenominationForExchange[2], optiDenominationForExchange[3], optiDenominationForExchange[4]);
-      System.out.printf("%,.2f %n", optiTotalForExchange);
+      //System.out.printf("%,.2f %n", optiTotalForExchange);
     }
   }
 
