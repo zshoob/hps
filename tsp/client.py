@@ -1,9 +1,4 @@
-'''
-Created on Sep 20, 2013
 
-@author: shaqal
-@modified by zhaohui
-'''
 import socket
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
