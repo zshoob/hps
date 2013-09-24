@@ -25,7 +25,10 @@ while True:
     if ';' in input_data:
         break
 
-#calculate your solution is less than 2 minutes
+print input_data
+#call tsp function
+
+# solution = tsp(input_data);
 solution = "1 2;"
 
 totalsent=0
