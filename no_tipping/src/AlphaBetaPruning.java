@@ -1,4 +1,4 @@
-package edu.nyu.heuristic.hw3;
+// package edu.nyu.heuristic.hw3;
 
 public class AlphaBetaPruning{
   private Heuristic heuristic;
@@ -11,5 +11,29 @@ public class AlphaBetaPruning{
     if(depth == 0){
       return heuristic.getStateValue(board);
     }
+
+    Color turn = board.getTurn();
+    int count = 0;
+    Iterable<Move> possibleMoves = heuristic.getOrderedMoves(board);
+    for(Move move:possibleMoves){
+      count++;
+      Board tmp = board.copy();
+      tmp.makeMove(move);
+      int childScore = alphaBeta(tmp, depth - 1, alpha, beta);
+      if(turn == Color.RED){
+        alpha = Math.max(alpha, childScore);
+        if(alpha >= beta){
+          break;
+        }
+      }else{
+        beta = Math.min(beta, childScore);
+        if(alpha <= beta){
+          break;
+        }
+      }
+    }
+
+    return color == Color.RED ? alpha : beta;
+
   }
 }

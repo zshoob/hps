@@ -1,4 +1,4 @@
-package edu.nyu.heuristic.hw3;
+// package edu.nyu.heuristic.hw3;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -11,6 +11,7 @@ public class Board{
   private Block[] slots;
   private Set<Block> redSet;
   private Set<Block> blueSet;
+  private Color turn;
 
   public Board(){
     this.slots = new Block[slotNum];
@@ -25,10 +26,14 @@ public class Board{
       Block blueBlock = new Block(i, Color.BLUE);
       blueSet.add(blueBlock);
     }
+    this.turn = Color.RED;
   }
 
-  public Board(Block[] slots){
+  public Board(Block[] slots, Set<Block> redSet, Set<Block> blueSet, Color turn){
     this.slots = slots;
+    this.redSet = redSet;
+    this.blueSet = blueSet;
+    this.turn = turn;
   }
 
   public double getAbs(){
@@ -64,6 +69,9 @@ public class Board{
     int position = move.getPosition();
     Block item = move.getBlock();
     Color itemColor = item.getColor();
+    if(itemColor != turn){
+      throw new RuntimeException("Not the turn");
+    }
     if(isPut){
       if(slots[position] == null){
         slots[position] = item;
@@ -90,6 +98,16 @@ public class Board{
         }
       }
     }
+    turn = turn == Color.RED ? Color.BLUE : Color.RED;
+  }
+
+  public Color getTurn(){
+    return this.turn;
+  }
+
+  public Board copy(){
+    Board tmp = new Board(slots, redSet, blueSet, turn);
+    return tmp;
   }
 
   public static void main(String[] args){
