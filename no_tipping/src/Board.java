@@ -101,6 +101,14 @@ public class Board{
     turn = turn == Color.RED ? Color.BLUE : Color.RED;
   }
 
+  public Set<Block> getRedSet(){
+    return this.redSet;
+  }
+
+  public Set<Block> getBlueSet(){
+    return this.blueSet;
+  }
+
   public Color getTurn(){
     return this.turn;
   }
