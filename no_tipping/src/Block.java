@@ -1,4 +1,4 @@
-// package edu.nyu.heuristic.hw3;
+package edu.nyu.heuristic.hw3;
 
 public class Block{
   private int weight;

@@ -1,4 +1,4 @@
-// package edu.nyu.heuristic.hw3;
+package edu.nyu.heuristic.hw3;
 
 public class AlphaBetaPruning{
   private Heuristic heuristic;
@@ -33,7 +33,7 @@ public class AlphaBetaPruning{
       }
     }
 
-    return color == Color.RED ? alpha : beta;
+    return turn == Color.RED ? alpha : beta;
 
   }
 }

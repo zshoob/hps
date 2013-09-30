@@ -1,13 +1,15 @@
-// package edu.nyu.heuristic.hw3;
+package edu.nyu.heuristic.hw3;
 
 import java.util.Set;
 import java.util.HashSet;
 
 public class Board{
   private final static int slotNum = 31;
-  private final static int center = 13;
+  private final static int center = 15;
   private final static int boardWeight = 3;
   private final static int blockSize = 12;
+  private final static int left = 12;
+  private final static int right = 14;
   private Block[] slots;
   private Set<Block> redSet;
   private Set<Block> blueSet;
@@ -35,7 +37,7 @@ public class Board{
     this.blueSet = blueSet;
     this.turn = turn;
   }
-
+  /*
   public double getAbs(){
     double abs = 0.0;
     abs += getBoardAbs();
@@ -63,8 +65,27 @@ public class Board{
     System.out.println("RIGHT: " + total);
     return total;
   }
+  */
+
+  public boolean isTipping(){
+    int leftSupport = (left - center) * boardWeight;
+    int rightSupport = (right - center) * boardWeight;
+    for(int i = 0; i < slotNum; i++){
+      if(slots[i] != null){
+        leftSupport += slots[i].getWeight() * (left - i);
+        rightSupport += slots[i].getWeight() * (right - i);
+      }
+    }
+
+    if(leftSupport > 0 || rightSupport < 0){
+      return true;
+    }else{
+      return false;
+    }
+  }
 
   public void makeMove(Move move){
+    
     boolean isPut = move.getIsPut();
     int position = move.getPosition();
     Block item = move.getBlock();
@@ -72,6 +93,7 @@ public class Board{
     if(itemColor != turn){
       throw new RuntimeException("Not the turn");
     }
+    
     if(isPut){
       if(slots[position] == null){
         slots[position] = item;
@@ -120,7 +142,14 @@ public class Board{
 
   public static void main(String[] args){
     Board board = new Board();
-    System.out.println(board.getAbs());
+    System.out.println("Initial State: " + board.isTipping());
+
+    Block block = new Block(1, Color.RED);
+    Move move = new Move(true, 5, block);
+    System.out.println("move? " + move.getIsPut() + ": " + move.getPosition());
+    board.makeMove(move);
+    System.out.println("After Move: " + board.isTipping());
+    
   }
 
 

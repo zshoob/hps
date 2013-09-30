@@ -1,5 +1,4 @@
-//package edu.nyu.heuristic.hw3;
-
+package edu.nyu.heuristic.hw3;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -13,6 +12,7 @@ public class NoTipping{
   private Set<Block> redSet;
   private Set<Block> blueSet;
   private Color turn;
+  private Mode mode;
 
   public NoTipping(){
     this.board = new Board();
@@ -27,7 +27,7 @@ public class NoTipping{
       String line = null;
       int num = 0;
       while((line = bf.readLine()) != null){
-        String[] tmpArray = line.splits("\\s+");
+        String[] tmpArray = line.split("\\s+");
         int weight = Integer.parseInt(tmpArray[1]);
         int col = Integer.parseInt(tmpArray[2]);
         Color color = null;
@@ -53,6 +53,25 @@ public class NoTipping{
     }catch(IOException e){
       System.out.println("File Read Exception!");
       e.printStackTrace();
+    }
+  }
+
+  public static void main(String[] args){
+    NoTipping notipping = new NoTipping();
+    if("1".equals(args[0])){
+      notipping.mode = Mode.ADD;
+    }else if("2".equals(args[0])){
+      notipping.mode = Mode.REMOVE;
+    }else{
+      throw new RuntimeException("Mode number error!");
+    }
+
+    if("1".equals(args[1])){
+      notipping.turn = Color.RED;
+    }else if("2".equals(args[1])){
+      notipping.turn = Color.BLUE;
+    }else{
+      throw new RuntimeException("Player number error!");
     }
   }
 

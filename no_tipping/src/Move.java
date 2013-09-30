@@ -1,11 +1,11 @@
-//package edu.nyu.heuristic.hw3;
+package edu.nyu.heuristic.hw3;
 
 public class Move{
   private boolean isPut;
   private int position;
   private Block block;
 
-  public Move(boolean isPUt, int position, Block block){
+  public Move(boolean isPut, int position, Block block){
     this.isPut = isPut;
     this.position = position;
     this.block = block;
