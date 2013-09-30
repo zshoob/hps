@@ -1,4 +1,4 @@
-package edu.nyu.heuristic.hw3;
+// package edu.nyu.heuristic.hw3;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -10,7 +10,7 @@ public class Board{
   private final static int blockSize = 12;
   private final static int left = 12;
   private final static int right = 14;
-  private Block[] slots;
+  public Block[] slots;
   private Set<Block> redSet;
   private Set<Block> blueSet;
   private Color turn;

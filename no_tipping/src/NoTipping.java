@@ -1,4 +1,4 @@
-package edu.nyu.heuristic.hw3;
+
 
 import java.util.Set;
 import java.util.HashSet;
@@ -73,6 +73,17 @@ public class NoTipping{
     }else{
       throw new RuntimeException("Player number error!");
     }
+
+    // notipping.readBoard("/Users/zhaohui/Documents/programs/hps/no_tipping/src/board.txt");
+    // notipping.
+    Heuristic heuristic = new HeuristicImpl();
+    AlphaBetaPruning alphabeta = new AlphaBetaPruning(heuristic);
+    Move move = alphabeta.findBestMove(notipping.board, 10);
+    
+    System.out.println(move.getPosition());
+    System.out.println(move.getBlock().getWeight());
+
   }
+
 
 }
