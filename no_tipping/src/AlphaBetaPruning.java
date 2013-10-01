@@ -20,11 +20,13 @@ public class AlphaBetaPruning{
     this.heuristic = heuristic;
   }
 
-  public Move findBestMove(Board state, int depth){
+  public Move findBestMove(Board state, int depth, Mode mode){
+
     boolean isRed = state.getTurn() == Color.RED ? true : false;
 
     List<MoveScore> scores = new ArrayList<MoveScore>();
-    Iterable<Move> possibleMoves = heuristic.getOrderedMoves(state);
+    Board newState = state.copy();
+    Iterable<Move> possibleMoves = heuristic.getOrderedMoves(newState, mode);
       
     int tmp = 0;
     for (Move move : possibleMoves) {
@@ -40,7 +42,7 @@ public class AlphaBetaPruning{
       for (int i = 0; i < depth; i++) {
         for (MoveScore moveScore : scores) {
           Move move = moveScore.move;
-          Board newState = state.copy();
+          newState = state.copy();
           newState.makeMove(move);
           double score =
               alphaBeta(newState, i, Integer.MIN_VALUE, Integer.MAX_VALUE);
@@ -59,14 +61,14 @@ public class AlphaBetaPruning{
     return scores.get(0).move;
   }
 
-  public double alphaBeta(Board board, int depth, double alpha, double beta){
+  public double alphaBeta(Board board, int depth, double alpha, double beta, Mode mode){
     if(depth == 0){
       return heuristic.getStateValue(board);
     }
 
     Color turn = board.getTurn();
     int count = 0;
-    Iterable<Move> possibleMoves = heuristic.getOrderedMoves(board);
+    Iterable<Move> possibleMoves = heuristic.getOrderedMoves(board, mode);
     for(Move move:possibleMoves){
       count++;
       Board tmp = board.copy();

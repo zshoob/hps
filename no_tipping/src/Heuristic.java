@@ -2,5 +2,5 @@
 
 public interface Heuristic{
   double getStateValue(Board board);
-  Iterable<Move> getOrderedMoves(Board board);
+  Iterable<Move> getOrderedMoves(Board board, Mode mode);
 }

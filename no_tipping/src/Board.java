@@ -31,41 +31,28 @@ public class Board{
     this.turn = Color.RED;
   }
 
-  public Board(Block[] slots, Set<Block> redSet, Set<Block> blueSet, Color turn){
-    this.slots = slots;
+  public Board(Block[] tmp, Set<Block> redSet, Set<Block> blueSet, Color turn){
+    this.slots = tmp;
     this.redSet = redSet;
     this.blueSet = blueSet;
     this.turn = turn;
   }
-  /*
-  public double getAbs(){
-    double abs = 0.0;
-    abs += getBoardAbs();
-    System.out.println("BOARD: " + abs);
+  
+
+  public int[] getSupportScore(){
+    int leftSupport = (left - center) * boardWeight;
+    int rightSupport = (right - center) * boardWeight;
     for(int i = 0; i < slotNum; i++){
       if(slots[i] != null){
-        int weight = slots[i].getWeight();
-        abs += weight * (i - center);
-      } 
+        leftSupport += slots[i].getWeight() * (left - i);
+        rightSupport += slots[i].getWeight() * (right - i);
+      }
     }
-    return abs;
+    int[] result = new int[2];
+    result[0] = leftSupport;
+    result[1] = rightSupport;
+    return result;
   }
-
-  private double getBoardAbs(){
-    int leftNum = 0 - center;
-    int rightNum = slotNum - 1 - center;
-    double leftWeight = boardWeight * (-leftNum) / (slotNum - 1.0);
-    double rightWeight = boardWeight * (rightNum) / (slotNum - 1.0);
-    double total = 0.0;
-    System.out.println("WEIGHT: " + leftWeight);
-    System.out.println("DISTANCE: " + (leftNum / 2.0 ));
-    total += leftNum / 2.0 * leftWeight;
-    System.out.println("LEFT: " + total);
-    total += rightNum / 2.0 * rightWeight;
-    System.out.println("RIGHT: " + total);
-    return total;
-  }
-  */
 
   public boolean isTipping(){
     int leftSupport = (left - center) * boardWeight;
@@ -76,6 +63,9 @@ public class Board{
         rightSupport += slots[i].getWeight() * (right - i);
       }
     }
+
+    //System.out.println("LEFT: " + leftSupport);
+    //System.out.println("RIGHT: " + rightSupport);
 
     if(leftSupport > 0 || rightSupport < 0){
       return true;
@@ -95,7 +85,7 @@ public class Board{
     }
     
     if(isPut){
-      if(slots[position] == null){
+      if(slots[position] == null || slots[position].getWeight() == 0){
         slots[position] = item;
         // remove block from set
         if(itemColor == Color.RED){
@@ -105,10 +95,11 @@ public class Board{
         }
 
       }else{
+        System.out.println("position: " + position);
         throw new RuntimeException("can not put to a position already taken");
       }
     }else{
-      if(slots[position] == null){
+      if(slots[position] == null|| slots[position].getWeight() == 0){
         throw new RuntimeException("cannot move a block not exists");
       }else{
         slots[position] = null;
@@ -135,8 +126,12 @@ public class Board{
     return this.turn;
   }
 
+  public void setTurn(Color color){
+    this.turn = color;
+  }
+
   public Board copy(){
-    Board tmp = new Board(slots, redSet, blueSet, turn);
+    Board tmp = new Board(slots.clone(), new HashSet<Block>(redSet), new HashSet<Block>(blueSet), turn);
     return tmp;
   }
 
