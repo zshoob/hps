@@ -80,9 +80,7 @@ public class Board{
     int position = move.getPosition();
     Block item = move.getBlock();
     Color itemColor = item.getColor();
-    if(itemColor != turn){
-      throw new RuntimeException("Not the turn");
-    }
+    // System.out.println("Turn: " + turn + " Move: " + itemColor);
     
     if(isPut){
       if(slots[position] == null || slots[position].getWeight() == 0){
@@ -102,7 +100,7 @@ public class Board{
       if(slots[position] == null|| slots[position].getWeight() == 0){
         throw new RuntimeException("cannot move a block not exists");
       }else{
-        slots[position] = null;
+        slots[position] = new Block(0, Color.NONE);
         // put the block to return to set
         if(itemColor == Color.RED){
           redSet.add(item);
@@ -133,6 +131,14 @@ public class Board{
   public Board copy(){
     Board tmp = new Board(slots.clone(), new HashSet<Block>(redSet), new HashSet<Block>(blueSet), turn);
     return tmp;
+  }
+
+  public boolean isPutOver(){
+    return redSet.size() == 0 && blueSet.size() == 0;
+  }
+
+  public boolean isRemoveOver(){
+    return redSet.size() == blockSize && blueSet.size() == blockSize;
   }
 
   public static void main(String[] args){

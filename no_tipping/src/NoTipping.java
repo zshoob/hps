@@ -25,6 +25,8 @@ public class NoTipping{
   public Board readBoard(String path, Color turn){
     Board newBoard = null;
     try{
+      this.redSet = new Board().getRedSet();
+      this.blueSet = new Board().getBlueSet();
       Block[] tmp = new Block[31];
       BufferedReader bf = new BufferedReader(new FileReader(path));
       String line = null;
@@ -107,7 +109,14 @@ public class NoTipping{
   }
 
   public static void main(String[] args){
+    
+
     NoTipping notipping = new NoTipping();
+    String path = "/Users/zhaohui/Documents/programs/hps/no_tipping/src/board1.txt";
+
+    // work for the architecture
+
+    /*
     if("1".equals(args[0])){
       notipping.mode = Mode.ADD;
     }else if("2".equals(args[0])){
@@ -124,25 +133,121 @@ public class NoTipping{
       throw new RuntimeException("Player number error!");
     }
 
-    String path = "/Users/zhaohui/Documents/programs/hps/no_tipping/src/board1.txt";
+    
 
-    System.out.println("Color: " + notipping.turn);
     notipping.board = notipping.readBoard(path, notipping.turn);
-
-    // notipping.board = new Board();
-    System.out.println("BEFORE: tipping?" + notipping.board.isTipping());
     Heuristic heuristic = new HeuristicImpl();
     AlphaBetaPruning alphabeta = new AlphaBetaPruning(heuristic);
     Move move = alphabeta.findBestMove(notipping.board.copy(), 100, notipping.mode); 
 
     System.out.println("Move Position: " + move.getPosition());
     System.out.println("Move Weight: " + move.getBlock().getWeight());
+    */
 
-    notipping.board.makeMove(move);
-    System.out.println(Arrays.toString(notipping.board.getSupportScore()));
-    System.out.println("AFTER: tipping?" + notipping.board.isTipping());
+
+    // work for test
+
     
-    notipping.writeToFile(path);
+    int count = 0;
+    Heuristic heuristic = new HeuristicImpl();
+    AlphaBetaPruning alphabeta = new AlphaBetaPruning(heuristic);
+    notipping.turn = Color.RED;
+    notipping.mode = Mode.ADD;
+    while(true){
+      notipping.board = notipping.readBoard(path, notipping.turn);
+      if(notipping.board.isPutOver()){
+        System.out.println("Add ALL!");
+        break;
+      }
+      if(notipping.board.isTipping()){
+        System.out.println("Tipping!");
+        break;
+      }
+
+      
+      Move move = alphabeta.findBestMove(notipping.board.copy(), 100, notipping.mode);
+
+      System.out.println("Position: " + move.getPosition());
+      System.out.println("Move Weight: " + move.getBlock().getWeight());
+
+      notipping.board.makeMove(move);
+      System.out.println(Arrays.toString(notipping.board.getSupportScore()));
+      // System.out.println("AFTER: tipping?" + notipping.board.isTipping());
+    
+      notipping.writeToFile(path);
+      notipping.turn = notipping.turn == Color.RED ? Color.BLUE : Color.RED;
+
+      count++;
+    }
+    System.out.println("Loop No: " + count);
+
+  
+
+    /*
+    if("1".equals(args[0])){
+      notipping.mode = Mode.ADD;
+    }else if("2".equals(args[0])){
+      notipping.mode = Mode.REMOVE;
+    }else{
+      throw new RuntimeException("Mode number error!");
+    }
+
+    if("1".equals(args[1])){
+      notipping.turn = Color.RED;
+    }else if("2".equals(args[1])){
+      notipping.turn = Color.BLUE;
+    }else{
+      throw new RuntimeException("Player number error!");
+    }
+    notipping.board = notipping.readBoard(path, notipping.turn);
+    Move move = alphabeta.findBestMove(notipping.board.copy(), 100, Mode.REMOVE);
+    System.out.println("Position: " + move.getPosition());
+    System.out.println("Move Weight: " + move.getBlock().getWeight());
+
+    */
+
+    int anotherCounter = 0;
+    while(true){
+      notipping.board = notipping.readBoard(path, notipping.turn);
+      if(notipping.board.isRemoveOver()){
+        System.out.println("Remove ALL!");
+        break;
+      }
+      if(notipping.board.isTipping()){
+        System.out.println("Tipping!");
+        break;
+      }
+      Move move = alphabeta.findBestMove(notipping.board.copy(), 100, Mode.REMOVE);
+      System.out.println("Position: " + move.getPosition());
+      System.out.println("Move Weight: " + move.getBlock().getWeight());
+      notipping.board.makeMove(move);
+      System.out.println(Arrays.toString(notipping.board.getSupportScore()));
+      // System.out.println("AFTER: tipping?" + notipping.board.isTipping());
+    
+      notipping.writeToFile(path);
+      notipping.turn = notipping.turn == Color.RED ? Color.BLUE : Color.RED;
+      anotherCounter++;
+    }
+    
+    System.out.println("Remove Loop: " + anotherCounter);
+
+    // System.out.println("Color: " + notipping.turn);
+    // notipping.board = notipping.readBoard(path, notipping.turn);
+
+    // // notipping.board = new Board();
+    // System.out.println("BEFORE: tipping?" + notipping.board.isTipping());
+    // Heuristic heuristic = new HeuristicImpl();
+    // AlphaBetaPruning alphabeta = new AlphaBetaPruning(heuristic);
+    // Move move = alphabeta.findBestMove(notipping.board.copy(), 100, notipping.mode); 
+
+    // System.out.println("Move Position: " + move.getPosition());
+    // System.out.println("Move Weight: " + move.getBlock().getWeight());
+
+    // notipping.board.makeMove(move);
+    // System.out.println(Arrays.toString(notipping.board.getSupportScore()));
+    // System.out.println("AFTER: tipping?" + notipping.board.isTipping());
+    
+    // notipping.writeToFile(path);
 
   }
 

@@ -95,8 +95,8 @@ public class HeuristicImpl implements Heuristic{
   	}
   }
   public Iterable<Move> getAddMoves(Board board){
-  	System.out.println("add move begin!");
-  	System.out.println("Turn: " + board.getTurn());
+  	//System.out.println("add move begin!");
+  	//System.out.println("Turn: " + board.getTurn());
   	Set<Block> blockSet = board.getTurn( ) == Color.RED ? board.getRedSet( ) : board.getBlueSet( );
   	Set<Move> unorderedMoves = new HashSet<Move>( );
   	for( int position = 0; position < 31; position++ ) {
@@ -115,6 +115,7 @@ public class HeuristicImpl implements Heuristic{
   }	 
   public Iterable<Move> getRemoveMoves(Board board){
   	boolean picky = false;
+  	// System.out.println("COLOR: " + board.getTurn());
   	if( board.getTurn( ) == Color.RED ) {
   		for( Block block : board.slots ) {
   			if( block != null && block.getWeight() != 0 && block.getColor( ) == Color.RED ) {

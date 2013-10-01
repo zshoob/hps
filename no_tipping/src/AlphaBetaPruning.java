@@ -36,7 +36,7 @@ public class AlphaBetaPruning{
         score.score = Double.MIN_VALUE;
         scores.add(score);
     }
-    System.out.println("POSSIBLE MOVE LEN: " + tmp);
+    // System.out.println("POSSIBLE MOVE LEN: " + tmp);
 
     try {
       for (int i = 0; i < depth; i++) {
