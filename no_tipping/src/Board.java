@@ -81,6 +81,16 @@ public class Board{
     Block item = move.getBlock();
     Color itemColor = item.getColor();
     // System.out.println("Turn: " + turn + " Move: " + itemColor);
+    if(isPut){
+      if(itemColor != turn){
+        System.out.println("Turn: " + turn + " Move: " + itemColor);
+        throw new RuntimeException("Not the turn to ADD!");
+      }
+    }else{
+      if(itemColor == Color.BLUE && turn == Color.RED && redSet.size() != blockSize){
+        throw new RuntimeException("Not the turn to REMOVE!");
+      }
+    }
     
     if(isPut){
       if(slots[position] == null || slots[position].getWeight() == 0){
@@ -138,7 +148,8 @@ public class Board{
   }
 
   public boolean isRemoveOver(){
-    return redSet.size() == blockSize && blueSet.size() == blockSize;
+    return (turn == Color.RED && redSet.size() == blockSize) 
+      || (turn == Color.BLUE && blueSet.size() == blockSize && redSet.size() == blockSize);
   }
 
   public static void main(String[] args){

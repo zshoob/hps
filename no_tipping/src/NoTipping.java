@@ -165,7 +165,7 @@ public class NoTipping{
       }
 
       
-      Move move = alphabeta.findBestMove(notipping.board.copy(), 100, notipping.mode);
+      Move move = alphabeta.findBestMove(notipping.board.copy(), 2, notipping.mode);
 
       System.out.println("Position: " + move.getPosition());
       System.out.println("Move Weight: " + move.getBlock().getWeight());
@@ -217,9 +217,10 @@ public class NoTipping{
         System.out.println("Tipping!");
         break;
       }
-      Move move = alphabeta.findBestMove(notipping.board.copy(), 100, Mode.REMOVE);
+      Move move = alphabeta.findBestMove(notipping.board.copy(), 2, Mode.REMOVE);
       System.out.println("Position: " + move.getPosition());
       System.out.println("Move Weight: " + move.getBlock().getWeight());
+      System.out.println("Move Color: " + move.getBlock().getColor());
       notipping.board.makeMove(move);
       System.out.println(Arrays.toString(notipping.board.getSupportScore()));
       // System.out.println("AFTER: tipping?" + notipping.board.isTipping());

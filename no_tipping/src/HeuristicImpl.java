@@ -26,8 +26,8 @@ public class HeuristicImpl implements Heuristic{
 			double sum = 0.0;
 			for( int idx = 0; idx < 31; idx++ ) {
 				int position = idx - 15;
-				Block b = board.slots[position];
-				if( b != null && b.getColor( ) == board.getTurn( ) )
+				Block b = board.slots[idx];
+				if( b != null && b.getWeight() != 0 && b.getColor( ) == board.getTurn( ) )
 					sum += b.getWeight( );
 			}
 			score += 10.0 * sum;		
@@ -39,7 +39,7 @@ public class HeuristicImpl implements Heuristic{
 			double enemy_locked = 0.0;
 			for( int idx = 0; idx < 31; idx++ ) {
 				Block b = board.slots[idx];
-				if( b == null )
+				if( b == null || b.getWeight() == 0)
 					continue;
 				int weight = b.getWeight( );
 				b.setWeight( 0 );
@@ -62,8 +62,8 @@ public class HeuristicImpl implements Heuristic{
 			double right = 0.0;
 			for( int idx = 0; idx < 31; idx++ ) {
 				int position = idx - 15;
-				Block b = board.slots[position];
-				if( b == null )
+				Block b = board.slots[idx];
+				if( b == null || b.getWeight() == 0)
 					continue;
 				if( b.getColor( ) == board.getTurn( ) && position < -3 )
 					left += b.getWeight( ) * (position+3);
@@ -103,17 +103,19 @@ public class HeuristicImpl implements Heuristic{
   		if( board.slots[position] == null || board.slots[position].getWeight() == 0) {
   			for( Block block : blockSet ) {
   				Move m = new Move(true, position, block );
-  				Board copy = board.copy();
-  				copy.makeMove(m);
-  				if(!copy.isTipping()){
-  					unorderedMoves.add( m );
-  				}
+          // unorderedMoves.add( m );
+  				 Board copy = board.copy();
+  				 copy.makeMove(m);
+  				 if(!copy.isTipping()){
+  				 	unorderedMoves.add( m );
+  				 }
   			}
   		}
   	}
   	return unorderedMoves;
   }	 
   public Iterable<Move> getRemoveMoves(Board board){
+    /*
   	boolean picky = false;
   	// System.out.println("COLOR: " + board.getTurn());
   	if( board.getTurn( ) == Color.RED ) {
@@ -135,5 +137,38 @@ public class HeuristicImpl implements Heuristic{
   		}
   	}
   	return unorderedMoves;
+    */
+
+    Set<Move> unorderedMoves = new HashSet<Move>( );
+    if(board.getTurn( ) == Color.RED){
+      for(int position = 0; position < 31; position++ ) {
+        Block block = board.slots[position];
+        if(block != null && block.getWeight() != 0) {
+          if(block.getColor() == Color.RED){
+            Move m = new Move(false, position, block);
+            // unorderedMoves.add( m );
+             Board copy = board.copy();
+             copy.makeMove(m);
+             if(!copy.isTipping()){
+               unorderedMoves.add( m );
+             }
+          }
+        }
+      }
+    }else{
+      for(int position = 0; position < 31; position++ ) {
+        Block block = board.slots[position];
+        if(block != null && block.getWeight() != 0) {
+          Move m = new Move(false, position, block);
+          //unorderedMoves.add( m );
+           Board copy = board.copy();
+           copy.makeMove(m);
+           if(!copy.isTipping()){
+             unorderedMoves.add( m );
+           }
+        }
+      }
+    }
+    return unorderedMoves;
   }   
 }

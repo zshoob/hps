@@ -27,16 +27,16 @@ public class AlphaBetaPruning{
     List<MoveScore> scores = new ArrayList<MoveScore>();
     Board newState = state.copy();
     Iterable<Move> possibleMoves = heuristic.getOrderedMoves(newState, mode);
-      
-    int tmp = 0;
     for (Move move : possibleMoves) {
-        tmp ++;
         MoveScore score = new MoveScore();
         score.move = move;
         score.score = Double.MIN_VALUE;
         scores.add(score);
     }
-    // System.out.println("POSSIBLE MOVE LEN: " + tmp);
+    System.out.println("POSSIBLE MOVE LEN: " + scores.size());
+    if(scores.size() == 0){
+      throw new RuntimeException("No move, will modify latter for architecture interface");
+    }
 
     try {
       for (int i = 0; i < depth; i++) {
@@ -45,8 +45,8 @@ public class AlphaBetaPruning{
           newState = state.copy();
           newState.makeMove(move);
           double score =
-              alphaBeta(newState, i, Integer.MIN_VALUE, Integer.MAX_VALUE, mode);
-          if (newState.getTurn() != Color.RED) {
+              alphaBeta(newState, i, Double.MIN_VALUE, Double.MAX_VALUE, mode);
+          if (!isRed) {
             score = -score;
           }
           moveScore.score = score;
@@ -54,10 +54,16 @@ public class AlphaBetaPruning{
         Collections.sort(scores); 
       }
     } catch (Exception e) {
+      e.printStackTrace();
       // OK, it should happen
     }
 
     Collections.sort(scores);
+    //test
+    for(MoveScore moveScore : scores){
+      System.out.println(moveScore.move.getPosition() + ":" + moveScore.score);
+    }
+    
     return scores.get(0).move;
   }
 
