@@ -45,7 +45,7 @@ public class AlphaBetaPruning{
           newState = state.copy();
           newState.makeMove(move);
           double score =
-              alphaBeta(newState, i, Integer.MIN_VALUE, Integer.MAX_VALUE);
+              alphaBeta(newState, i, Integer.MIN_VALUE, Integer.MAX_VALUE, mode);
           if (newState.getTurn() != Color.RED) {
             score = -score;
           }
@@ -73,7 +73,7 @@ public class AlphaBetaPruning{
       count++;
       Board tmp = board.copy();
       tmp.makeMove(move);
-      double childScore = alphaBeta(tmp, depth - 1, alpha, beta);
+      double childScore = alphaBeta(tmp, depth - 1, alpha, beta, mode);
       if(turn == Color.RED){
         alpha = Math.max(alpha, childScore);
         if(alpha >= beta){
