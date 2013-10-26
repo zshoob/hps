@@ -57,8 +57,13 @@ public class EvasionClient{
       assert handshake.trim().equalsIgnoreCase("Team Name?");
       sendSocket(out, teamName);
 
-      String setupInfo = readSocket(in);
-      setupInfo = readSocket(in);
+      String setupInfo = readSocket(in).trim();
+      int n = Integer.parseInt(setupInfo.substring(0, setupInfo.indexOf(" ")));
+      int m = Integer.parseInt(setupInfo.substring(setupInfo.indexOf(" ") + 1));
+      System.out.printf("M:%d N%d %n", m, n);
+      // String inputInfo = readSocket(in);
+      String inputInfo = "Walls\n3\n1 (1,9),(1,400)\n2 (34,80),(300,80)\n3 (20,450),(20,460)\nMoves To Next Wall Build\n7\nH NE (100,100)\nP (470,470)";
+      EvasionGame game = EvasionGame.constructGame(inputInfo, n, m);
 
     } catch (UnknownHostException e) {
       System.err.printf("Unknown host: %s:%d\n", host, port);

@@ -157,17 +157,19 @@ class BoardStates {
 }
 
 public class EvasionGame {
-	public static BoardStates board;
-	public static Hunter hunter;
-	public static Prey prey;
-	public static boolean caught;
+	public  BoardStates board;
+	public  Hunter hunter;
+	public  Prey prey;
+	public  boolean caught;
 	public static final int RADIUS = 4;
-	public static boolean turn;
-	public static int[][] availableArea;
+	public  boolean turn;
+	public  int[][] availableArea;
   private int stepsToBuildWalls;
+  public int m;
+  public int n;
 
 
-	public EvasionGame() {
+	public EvasionGame(){
 		turn = true;
 		caught = false;
 		board = new BoardStates();
@@ -176,17 +178,19 @@ public class EvasionGame {
 		availableArea = new int[2][2];
 	}
 
-  public EvasionGame(BoardStates board, Hunter hunter, Prey prey){
+  public EvasionGame(BoardStates board, Hunter hunter, Prey prey, int n, int m){
     this.board = board;
     this.hunter = hunter;
     this.prey = prey;
     turn = true;
     caught = false;
     availableArea = new int[2][2];
+    this.m = m;
+    this.n = n;
   }
 
-  public static EvasionGame constructGame(String message){
-    String[] messArr = message.split("\\s+");
+  public static EvasionGame constructGame(String message, int n, int m){
+    String[] messArr = message.split("\n");
     assert messArr[0].equals("Walls");
     int wallMount = Integer.parseInt(messArr[1]);
     BoardStates bs = new BoardStates();
@@ -200,10 +204,11 @@ public class EvasionGame {
     Hunter hunter = parseHunter(messArr[4 + wallMount], bs);
     Prey prey = parsePrey(messArr[5 + wallMount], bs);
 
-    return new EvasionGame(bs, hunter, prey);
+    return new EvasionGame(bs, hunter, prey, n, m);
   }
 
   public static Wall parseWall(String str){
+    System.out.println("WALL " + str);
     int indexOfLeftBrac = str.indexOf("(");
     int indexOfFirstComm = str.indexOf(",");
     int indexOfRightBrac = str.indexOf(")");
@@ -225,8 +230,11 @@ public class EvasionGame {
   }
 
   public static Hunter parseHunter(String str, BoardStates bs){
+    System.out.println("Hunter:" + str);
     int indexOfFirstWhiteSpace = str.indexOf(" ");
-    int indexOfSecondWhiteSpace = str.indexOf(" ", indexOfFirstWhiteSpace);
+
+    int indexOfSecondWhiteSpace = str.indexOf(" ", indexOfFirstWhiteSpace + 1);
+    System.out.println("Index: " + indexOfFirstWhiteSpace + indexOfSecondWhiteSpace);
     MoveType type = MoveType.valueOf(str.substring(indexOfFirstWhiteSpace + 1, indexOfSecondWhiteSpace));
     int indexOfLeftBrac = str.indexOf("(");
     int indexOfComm = str.indexOf(",");
