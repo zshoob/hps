@@ -194,7 +194,7 @@ public class EvasionGame {
   	availableArea[1][1] = maxY;
   }
 
-  public String generateMoveOfPrey(){
+  public String getMoveOfPrey(){
   	getAvailableArea();
     int n = stepsToBuildWalls;
     while(n >= 0){
@@ -202,6 +202,10 @@ public class EvasionGame {
       n--;
     }
     
+  }
+
+  public String getMoveOfHunter(){
+
   }
 
 }

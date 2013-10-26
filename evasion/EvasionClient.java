@@ -15,12 +15,20 @@ public class EvasionClient{
   static String endofmsg = "<EOM>";
   static String teamName = "OffByOne";
 
+  static EvasionGame constructGame(String str){
+
+  }
+
   public static String readSocket(BufferedReader in) throws IOException{
     StringBuilder data = new StringBuilder();
     char[] cbuf = new char[2048];
-    while((in.read(cbuf,0,2048))!= -1){
+    while((in.read(cbuf, 0, 2048))!= -1){
       data.append(cbuf);
-      if(data.toString().trim().endsWith(endofmsg)){
+      System.out.println("Temp data: " + data.toString() );
+      System.out.println(data.toString().contains("\n"));
+      System.out.println(data.toString().endsWith("\n"));
+      if(data.toString().contains("\n")){
+        System.out.println("break");
         break;
       }
     }
@@ -28,8 +36,8 @@ public class EvasionClient{
   }
 
   public static void sendSocket(PrintWriter out, String text){
-    System.out.println("Sending : " + text + endofmsg);
-    out.println(text + endofmsg);
+    System.out.println("Sending : " + text);
+    out.println(text);
   }
 
   public static void main(String[] args){
@@ -53,12 +61,25 @@ public class EvasionClient{
       assert handshake.trim().equalsIgnoreCase("Team Name?");
       sendSocket(out, teamName);
 
+      String setupInfo = readSocket(in);
+      setupInfo = readSocket(in);
+
     } catch (UnknownHostException e) {
       System.err.printf("Unknown host: %s:%d\n", host, port);
       System.exit(1);
     } catch (IOException e) {
      System.err.printf("Can't get I/O streams for the connection to: %s:%d\n", host, port);
      System.exit(1);
+   }finally{
+    try{
+      in.close();
+      out.close();
+      sock.close();
+    }catch(Exception e){
+      System.out.println("Close Stream and socket exception!");
+      System.exit(1);
+    }
+    
    }
 
     
