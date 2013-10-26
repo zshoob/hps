@@ -15,10 +15,6 @@ public class EvasionClient{
   static String endofmsg = "<EOM>";
   static String teamName = "OffByOne";
 
-  static EvasionGame constructGame(String str){
-
-  }
-
   public static String readSocket(BufferedReader in) throws IOException{
     StringBuilder data = new StringBuilder();
     char[] cbuf = new char[2048];

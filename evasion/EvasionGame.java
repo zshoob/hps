@@ -73,13 +73,37 @@ class Prey extends Player {
 	}
 }
 
+enum MoveType{
+  NN, WW, EE, SS, NW, NE, SW, SE,;
+}
+
 class Hunter extends Player {
 	int delta_x, delta_y;
+  MoveType type;
 
-	public Hunter(int x, int y, BoardStates board) {
+	public Hunter(int x, int y, BoardStates board, MoveType type) {
 		super(x, y, board);
-		delta_x = 2;
-		delta_y = 2;
+    this.type = type;
+    switch(type){
+      case SE:
+        delta_x = 2;
+        delta_y = 2;
+        break;
+      case NE:
+        delta_x = 2;
+        delta_y = -2;
+        break;
+      case NW:
+        delta_x = -2;
+        delta_y = -2;
+        break;
+      case SW:
+        delta_x = -2;
+        delta_y = 2;
+        break;
+      default:
+        break;
+    }
 	}
 
 	public void bounceMove() {
@@ -126,6 +150,10 @@ class BoardStates {
 		walls[22] = new Wall(500, 0);
 		walls[23] = new Wall(0, 1);
 	}
+
+  public BoardStates(Wall[] walls){
+    this.walls = walls;
+  }
 }
 
 public class EvasionGame {
@@ -143,10 +171,81 @@ public class EvasionGame {
 		turn = true;
 		caught = false;
 		board = new BoardStates();
-		hunter = new Hunter(50, 50, board);
+		hunter = new Hunter(50, 50, board, MoveType.SE);
 		prey = new Prey(320, 200, board);
 		availableArea = new int[2][2];
 	}
+
+  public EvasionGame(BoardStates board, Hunter hunter, Prey prey){
+    this.board = board;
+    this.hunter = hunter;
+    this.prey = prey;
+    turn = true;
+    caught = false;
+    availableArea = new int[2][2];
+  }
+
+  public static EvasionGame constructGame(String message){
+    String[] messArr = message.split("\\s+");
+    assert messArr[0].equals("Walls");
+    int wallMount = Integer.parseInt(messArr[1]);
+    BoardStates bs = new BoardStates();
+    for(int i = 0; i < wallMount; i++){
+      bs.walls[i] = parseWall(messArr[2 + i]);
+    }
+    System.out.println(messArr[2 + wallMount]);
+
+    int stepsToBuildWalls = Integer.parseInt(messArr[3 + wallMount]);
+
+    Hunter hunter = parseHunter(messArr[4 + wallMount], bs);
+    Prey prey = parsePrey(messArr[5 + wallMount], bs);
+
+    return new EvasionGame(bs, hunter, prey);
+  }
+
+  public static Wall parseWall(String str){
+    int indexOfLeftBrac = str.indexOf("(");
+    int indexOfFirstComm = str.indexOf(",");
+    int indexOfRightBrac = str.indexOf(")");
+    int x1 = Integer.parseInt(str.substring(indexOfLeftBrac + 1, indexOfFirstComm));
+    int y1 = Integer.parseInt(str.substring(indexOfFirstComm + 1, indexOfRightBrac));
+
+    indexOfLeftBrac = str.indexOf("(", indexOfRightBrac);
+    indexOfFirstComm = str.indexOf(",", indexOfLeftBrac);
+    indexOfRightBrac = str.indexOf(")", indexOfFirstComm);
+    int x2 = Integer.parseInt(str.substring(indexOfLeftBrac + 1, indexOfFirstComm));
+    int y2 = Integer.parseInt(str.substring(indexOfFirstComm + 1, indexOfRightBrac));
+
+    if(x1 == x2){
+      return new Wall(x1, 1);
+    }else{
+      return new Wall(y1, 0);
+    }
+
+  }
+
+  public static Hunter parseHunter(String str, BoardStates bs){
+    int indexOfFirstWhiteSpace = str.indexOf(" ");
+    int indexOfSecondWhiteSpace = str.indexOf(" ", indexOfFirstWhiteSpace);
+    MoveType type = MoveType.valueOf(str.substring(indexOfFirstWhiteSpace + 1, indexOfSecondWhiteSpace));
+    int indexOfLeftBrac = str.indexOf("(");
+    int indexOfComm = str.indexOf(",");
+    int indexOfRightBrac = str.indexOf(")");
+
+    int x = Integer.parseInt(str.substring(indexOfLeftBrac + 1, indexOfComm));
+    int y = Integer.parseInt(str.substring(indexOfComm + 1, indexOfRightBrac));
+    return new Hunter(x, y, bs, type);
+  }
+
+  public static Prey parsePrey(String str, BoardStates bs){
+    int indexOfLeftBrac = str.indexOf("(");
+    int indexOfComm = str.indexOf(",");
+    int indexOfRightBrac = str.indexOf(")");
+
+    int x = Integer.parseInt(str.substring(indexOfLeftBrac + 1, indexOfComm));
+    int y = Integer.parseInt(str.substring(indexOfComm + 1, indexOfRightBrac));
+    return new Prey(x, y, bs);
+  }
 
 	public boolean caught() {
 		if (getDistance() <= RADIUS) {
@@ -162,7 +261,7 @@ public class EvasionGame {
     return Math.sqrt(disX * disX + disY * disY);
   }
 
-  private getAvailableArea(){
+  private void getAvailableArea(){
   	int minX = Integer.MAX_VALUE;
   	int minY = Integer.MAX_VALUE;
   	int maxX = Integer.MIN_VALUE;
@@ -201,11 +300,11 @@ public class EvasionGame {
       hunter.bounceMove();
       n--;
     }
-    
+    return "";
   }
 
   public String getMoveOfHunter(){
-
+    return "";
   }
 
 }
