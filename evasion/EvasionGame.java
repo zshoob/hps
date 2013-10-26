@@ -197,7 +197,7 @@ public class EvasionGame {
     for(int i = 0; i < wallMount; i++){
       bs.walls[i] = parseWall(messArr[2 + i]);
     }
-    System.out.println(messArr[2 + wallMount]);
+    // System.out.println(messArr[2 + wallMount]);
 
     int stepsToBuildWalls = Integer.parseInt(messArr[3 + wallMount]);
 
@@ -208,7 +208,6 @@ public class EvasionGame {
   }
 
   public static Wall parseWall(String str){
-    System.out.println("WALL " + str);
     int indexOfLeftBrac = str.indexOf("(");
     int indexOfFirstComm = str.indexOf(",");
     int indexOfRightBrac = str.indexOf(")");
@@ -230,11 +229,11 @@ public class EvasionGame {
   }
 
   public static Hunter parseHunter(String str, BoardStates bs){
-    System.out.println("Hunter:" + str);
+    // System.out.println("Hunter:" + str);
     int indexOfFirstWhiteSpace = str.indexOf(" ");
 
     int indexOfSecondWhiteSpace = str.indexOf(" ", indexOfFirstWhiteSpace + 1);
-    System.out.println("Index: " + indexOfFirstWhiteSpace + indexOfSecondWhiteSpace);
+    // System.out.println("Index: " + indexOfFirstWhiteSpace + indexOfSecondWhiteSpace);
     MoveType type = MoveType.valueOf(str.substring(indexOfFirstWhiteSpace + 1, indexOfSecondWhiteSpace));
     int indexOfLeftBrac = str.indexOf("(");
     int indexOfComm = str.indexOf(",");
@@ -308,7 +307,7 @@ public class EvasionGame {
       hunter.bounceMove();
       n--;
     }
-    return "";
+    return "EE";
   }
 
   public String getMoveOfHunter(){

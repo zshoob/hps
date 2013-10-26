@@ -15,20 +15,39 @@ public class EvasionClient{
   static String endofmsg = "<EOM>";
   static String teamName = "OffByOne";
 
+  // public static String readSocket(BufferedReader in) throws IOException{
+  //   StringBuilder data = new StringBuilder();
+  //   char[] cbuf = new char[2048];
+  //   while((in.read(cbuf, 0, 2048))!= -1){
+  //     data.append(cbuf);
+  //     System.out.println("Temp data: " + data.toString() );
+  //     if(data.toString().contains("\n")){
+  //       System.out.println("break");
+  //       break;
+  //     }
+  //   }
+  //   return data.toString().replaceAll(endofmsg, "");
+  // }
+
   public static String readSocket(BufferedReader in) throws IOException{
-    StringBuilder data = new StringBuilder();
-    char[] cbuf = new char[2048];
-    while((in.read(cbuf, 0, 2048))!= -1){
-      data.append(cbuf);
-      System.out.println("Temp data: " + data.toString() );
-      System.out.println(data.toString().contains("\n"));
-      System.out.println(data.toString().endsWith("\n"));
-      if(data.toString().contains("\n")){
-        System.out.println("break");
+    StringBuilder sb = new StringBuilder();
+    String data = null;
+    int count = 0;
+    int total = -1;
+    while((data = in.readLine()) != null){
+      if(count == 1){
+        total = Integer.parseInt(data) + 6;
+      }
+      System.out.println(data);
+      sb.append(data);
+      sb.append("\n");
+      if(count == total){
         break;
       }
+      count++;
     }
-    return data.toString().replaceAll(endofmsg, "");
+
+    return sb.toString();
   }
 
   public static void sendSocket(PrintWriter out, String text){
@@ -52,18 +71,25 @@ public class EvasionClient{
       out = new PrintWriter(sock.getOutputStream(), true);
       in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 
-      String handshake = readSocket(in);
-      System.out.println("Accept socket message! ");
-      assert handshake.trim().equalsIgnoreCase("Team Name?");
-      sendSocket(out, teamName);
+      String handshake = in.readLine();
+      if(handshake.contains("Team")){
+        sendSocket(out, teamName);
+      }
 
-      String setupInfo = readSocket(in).trim();
+      String setupInfo = in.readLine().trim();
       int n = Integer.parseInt(setupInfo.substring(0, setupInfo.indexOf(" ")));
       int m = Integer.parseInt(setupInfo.substring(setupInfo.indexOf(" ") + 1));
       System.out.printf("M:%d N%d %n", m, n);
-      // String inputInfo = readSocket(in);
-      String inputInfo = "Walls\n3\n1 (1,9),(1,400)\n2 (34,80),(300,80)\n3 (20,450),(20,460)\nMoves To Next Wall Build\n7\nH NE (100,100)\nP (470,470)";
-      EvasionGame game = EvasionGame.constructGame(inputInfo, n, m);
+
+      while(true){
+        String inputInfo = readSocket(in);
+        EvasionGame game = EvasionGame.constructGame(inputInfo, n, m);
+
+        //call the move method. For Zach, you may need to use getMoveOfHunter instead
+        String output = game.getMoveOfPrey();
+        sendSocket(out, output);
+      }
+      
 
     } catch (UnknownHostException e) {
       System.err.printf("Unknown host: %s:%d\n", host, port);
@@ -81,9 +107,9 @@ public class EvasionClient{
       System.exit(1);
     }
     
-   }
+  }
 
-    
- }
+
+}
 
 }
