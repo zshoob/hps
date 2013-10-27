@@ -14,6 +14,7 @@ public class EvasionClient{
   static String host = "127.0.0.1";
   static String endofmsg = "<EOM>";
   static String teamName = "OffByOne";
+  static int character = 1; // 0 for hunter 1 for prey
 
   // public static String readSocket(BufferedReader in) throws IOException{
   //   StringBuilder data = new StringBuilder();
@@ -61,7 +62,7 @@ public class EvasionClient{
     }
 
     if(args.length >=2){
-      teamName = args[1].trim();
+      character = Integer.parseInt(args[1].trim());
     }
 
     System.out.printf("%d %s\n",port,teamName);
@@ -86,7 +87,13 @@ public class EvasionClient{
         EvasionGame game = EvasionGame.constructGame(inputInfo, n, m);
 
         //call the move method. For Zach, you may need to use getMoveOfHunter instead
-        String output = game.getMoveOfPrey();
+
+        String output = null;
+        if(character == 0){
+          output = game.getMoveOfHunter();
+        }else{
+          output = game.getMoveOfPrey();
+        }
         sendSocket(out, output);
       }
       

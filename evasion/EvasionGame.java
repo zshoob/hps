@@ -178,7 +178,7 @@ public class EvasionGame {
 		availableArea = new int[2][2];
 	}
 
-  public EvasionGame(BoardStates board, Hunter hunter, Prey prey, int n, int m){
+  public EvasionGame(BoardStates board, Hunter hunter, Prey prey, int n, int m, int stepsToBuildWalls){
     this.board = board;
     this.hunter = hunter;
     this.prey = prey;
@@ -187,6 +187,7 @@ public class EvasionGame {
     availableArea = new int[2][2];
     this.m = m;
     this.n = n;
+    this.stepsToBuildWalls = stepsToBuildWalls;
   }
 
   public static EvasionGame constructGame(String message, int n, int m){
@@ -204,7 +205,7 @@ public class EvasionGame {
     Hunter hunter = parseHunter(messArr[4 + wallMount], bs);
     Prey prey = parsePrey(messArr[5 + wallMount], bs);
 
-    return new EvasionGame(bs, hunter, prey, n, m);
+    return new EvasionGame(bs, hunter, prey, n, m, stepsToBuildWalls);
   }
 
   public static Wall parseWall(String str){
@@ -254,60 +255,269 @@ public class EvasionGame {
     return new Prey(x, y, bs);
   }
 
-	public boolean caught() {
-		if (getDistance() <= RADIUS) {
-			return true;
-		}else{
-			return false;
-		}
-	}
-
-	private double getDistance(){
-    int disX = hunter.x - prey.x;
-    int disY = hunter.y - prey.y;
-    return Math.sqrt(disX * disX + disY * disY);
-  }
-
-  private void getAvailableArea(){
-  	int minX = Integer.MAX_VALUE;
-  	int minY = Integer.MAX_VALUE;
-  	int maxX = Integer.MIN_VALUE;
-  	int maxY = Integer.MIN_VALUE;
-  	for(Wall wall:board.walls){
-  		if(wall.position >= 0){
-  			// horizontal
-  			if(wall.direction == 0){
-  				if(wall.position > maxX){
-  					maxX = wall.position;
-  				}
-  				if(wall.position < minX){
-  					minX = wall.position;
-  				}
-  			}else{
-  				if(wall.position > maxY){
-  					maxY = wall.position;
-  				}
-  				if(wall.position < minY){
-  					minY = wall.position;
-  				}
-  			}
-  		}
-  	}
-
-  	availableArea[0][0] = minX;
-  	availableArea[0][1] = maxX;
-  	availableArea[1][0] = minY;
-  	availableArea[1][1] = maxY;
-  }
 
   public String getMoveOfPrey(){
-  	getAvailableArea();
-    int n = stepsToBuildWalls;
-    while(n >= 0){
-      hunter.bounceMove();
-      n--;
+    // get hunter info
+    int hunterX = hunter.x;
+    int hunterY = hunter.y;
+    MoveType direction = hunter.type;
+
+    //get prey info
+    int preyX = prey.x;
+    int preyY = prey.y;
+
+    //get available area for prey to move
+    int minX = Integer.MAX_VALUE; // smallest x prey can move to
+    int minY = Integer.MAX_VALUE; // smallest y prey can move to
+    int maxX = Integer.MAX_VALUE;
+    int maxY = Integer.MAX_VALUE;
+    for(Wall wall:board.walls){
+      if(wall.position >= 0){
+        // horizontal
+        if(wall.direction == 0){
+          if(wall.position > preyX && wall.position < maxX){
+            maxX = wall.position;
+          }
+          if(wall.position < preyX && wall.position > minX){
+            minX = wall.position;
+          }
+        }else{
+          if(wall.position > preyY && wall.position < maxY){
+            maxY = wall.position;
+          }
+          if(wall.position < preyY && wall.position > minY){
+            minY = wall.position;
+          }
+        }
+      }
     }
-    return "EE";
+
+    System.out.println("PREY POSITION->" + preyX + ", " + preyY);
+    System.out.println("HUNTER POSITION->" + hunterX + ", " + hunterY);
+    System.out.println("PREY AREA->" + minX + "-" + maxX + "," + minY + "-" + maxY);
+
+    // check whether prey and hunter same side
+    boolean isSameSide = true;
+    if(hunterX < minX || hunterX > maxX || hunterY < minY || hunterY > maxY){
+      isSameSide = false;
+    }
+
+    // If not, try to move towards to current area's center
+    if(!isSameSide){
+      System.out.println("HUNTER AND PREY NOT SAME SIDE");
+      int centerX = (minX + maxX) / 2;
+      int centerY = (minY + maxY) / 2;
+      return moveTowards(centerX, centerY, preyX, preyY);
+    }
+
+    // check whether the hunter will hit the wall before next build
+    int stepsleft = stepsToBuildWalls;
+    int hunterImageX = hunterX;
+    int hunterImageY = hunterY;
+    boolean willHunterTouchWall = false;
+    switch(direction){
+      case NE:
+        hunterImageX = hunterX + stepsleft;
+        hunterImageY = hunterY - stepsleft;
+        break;
+      case NW:
+        hunterImageX = hunterX - stepsleft;
+        hunterImageY = hunterY - stepsleft;
+        break;
+      case SE:
+        hunterImageX = hunterX + stepsleft;
+        hunterImageY = hunterY + stepsleft;
+        break;
+      case SW:
+        hunterImageX = hunterX - stepsleft;
+        hunterImageY = hunterY + stepsleft;
+        break;
+      default:
+        break;
+    }
+
+    if(hunterImageX < minX || hunterImageX > maxX || hunterImageY < minY || hunterImageY > maxY){
+      willHunterTouchWall = true;
+    }
+
+    // check whether hunter move towards prey
+    boolean isHunterTowardsPrey = true;
+    int hunterNextX = hunterX;
+    int hunterNextY = hunterY;
+    switch(direction){
+      case NE:
+        hunterNextX = hunterX + 2;
+        hunterNextY = hunterY - 2;
+        break;
+      case NW:
+        hunterNextX = hunterX - 2;
+        hunterNextY = hunterY - 2;
+        break;
+      case SE:
+        hunterNextX = hunterX + 2;
+        hunterNextY = hunterY + 2;
+        break;
+      case SW:
+        hunterNextX = hunterX - 2;
+        hunterNextY = hunterY + 2;
+        break;
+      default:
+        break;
+    }
+
+    double distanceNow = getDistance(hunterX, hunterY, preyX, preyY);
+    double distanceOneStepAfter = getDistance(hunterNextX, hunterNextY, preyX, preyY);
+    if(distanceNow < distanceOneStepAfter){
+      isHunterTowardsPrey = false;
+    }
+
+    // check whether hunter will catch prey before building walls
+    boolean willHunterCatchPrey = false;
+    double nearestDistance = Double.MAX_VALUE;
+    int stepsToCatch = 0;
+    Hunter clone = new Hunter(hunterX, hunterY, board, direction);
+    for(int i = 0; i < stepsleft / 2; i++){
+      clone.bounceMove();
+      double dist = getDistance(preyX, preyY, clone.x, clone.y);
+      if(dist < nearestDistance){
+        nearestDistance = dist;
+      }
+      if(dist <= RADIUS){
+        willHunterCatchPrey = true;
+        stepsToCatch = i + 1;
+        break;
+      }
+    }
+
+    // If hunter will catch preyer
+    if(willHunterCatchPrey){
+      if(isHunterTowardsPrey){
+        System.out.println("Towards Prey and Will Catch");
+        double angle = 0.0;
+        angle = Math.abs(((double)(preyY - hunterY))/(preyX - hunterX));
+        boolean isAngleLessThan45 = true;
+        if(angle > 1.0){
+          isAngleLessThan45 = false;
+        }
+        switch(direction){
+          case NE:
+            if(isAngleLessThan45){
+              return "SE";
+            }else{
+              return "NW";
+            }
+          case NW:
+            if(isAngleLessThan45){
+              return "SW";
+            }else{
+              return "NE";
+            }
+          case SE:
+            if(isAngleLessThan45){
+              return "NE";
+            }else{
+              return "SW";
+            }
+          case SW:
+            if(isAngleLessThan45){
+              return "NW";
+            }else{
+              return "SE";
+            }
+          default:
+            return "ZZ";
+        }
+      }else{
+        System.out.println("Very rare case happens");
+        // Will think how to move here
+      }
+    }
+
+    //general conditions
+    if(isHunterTowardsPrey){
+      // If hunter towards prey, prey move towards hunter to get better chance to live
+      // cause if prey move towards hunter, it will get bigger available area when hunter put wall
+      switch(direction){
+        case NE:
+          return "SW";
+        case NW:
+          return "SE";
+        case SE:
+          return "NW";
+        case SW:
+          return "NE";
+        default:
+          return "ZZ";
+      }
+    }else{
+      return direction.name();
+    }
+
+    // return "ZZ";
+  }
+
+  // best way to move towards specific point
+  private String moveTowards(int centerX, int centerY, int preyX, int preyY){
+    int diffX = preyX - centerX;
+    int diffY = preyY - centerY;
+    if(diffX == 0){
+      if(diffY == 0){
+        return "ZZ";
+      }else if(diffY > 0){
+        return "NN";
+      }else{
+        return "SS";
+      }
+    }
+    if(diffY == 0){
+      if(diffX > 0){
+        return "WW";
+      }else{
+        return "EE";
+      }
+    }
+
+    double angle = Math.abs(((double) diffX) / diffY);
+    if(angle > 2.0 || angle < 0.5){
+      if(diffX > 0 && diffY > 0){
+        return "NW";
+      }else if(diffX > 0 && diffY < 0){
+        return "SW";
+      }else if(diffX < 0 && diffY > 0){
+        return "NE";
+      }else{
+        return "SE";
+      }
+    }else{
+      if(Math.abs(diffX) > Math.abs(diffY)){
+        if(diffX > 0){
+          return "WW";
+        }else{
+          return "EE";
+        }
+      }else{
+        if(diffY > 0){
+          return "NN";
+        }else{
+          return "SS";
+        }
+      }
+    }
+    
+  }
+
+  public boolean caught() {
+    if (getDistance(prey.x, prey.y, hunter.x, hunter.y) <= RADIUS) {
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+  private double getDistance(int x1, int y1, int x2, int y2){
+    int disX = x1 - x2;
+    int disY = y1 - y2;
+    return Math.sqrt(disX * disX + disY * disY);
   }
 
   public String getMoveOfHunter(){
