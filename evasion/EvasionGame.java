@@ -8,16 +8,29 @@ class Wall {
 	// 0 is horizontal 1 is vertical
 	public int direction;
 	public int status;
+	public int x1;
+	public int x2;
+	public int y1;
+	public int y2;
 
-	public Wall(int position, int direction) {
+
+	public Wall(int position, int direction, int x1, int x2, int y1, int y2) {
 		this.position = position;
 		this.direction = direction;
+		this.x1 = x1;
+		this.x2 = x2;
+		this.y1 = y1;
+		this.y2 = y2;
 		this.status = 0;
 	}
 
 	public void reset() {
 		position = -100;
 		direction = -100;
+		x1 = 0;
+		x2 = 0;
+		y1 = 0;
+		y2 = 499;
 	}
 
 	public void set(int p, int d) {
@@ -107,31 +120,35 @@ class Hunter extends Player {
 	}
 
 	public void bounceMove() {
-
 		int new_x = x + delta_x;
 		int new_y = y + delta_y;
 		for (int i = 0; i < b.walls.length; i++) {
-			if (b.walls[i].direction == 0) {
-				if (y < b.walls[i].position && new_y >= b.walls[i].position) {
-					delta_y *= -1;
-				}
-				if (y > b.walls[i].position && new_y <= b.walls[i].position) {
-					delta_y *= -1;
-				}
-			}
-			if (b.walls[i].direction == 1) {
-				if (x < b.walls[i].position && new_x >= b.walls[i].position) {
-					delta_x *= -1;
-				}
-				if (x > b.walls[i].position && new_x <= b.walls[i].position) {
-					delta_x *= -1;
-				}
-			}
+			if(b.walls[i].position >= 0){
+        if (b.walls[i].direction == 0) {
+          if (y < b.walls[i].position && new_y >= b.walls[i].position) {
+            delta_y *= -1;
+          }
+          if (y > b.walls[i].position && new_y <= b.walls[i].position) {
+            delta_y *= -1;
+          }
+        }
+        if (b.walls[i].direction == 1) {
+          if (x < b.walls[i].position && new_x >= b.walls[i].position) {
+            delta_x *= -1;
+          }
+          if (x > b.walls[i].position && new_x <= b.walls[i].position) {
+            delta_x *= -1;
+          }
+        }
+      }
 		}
-
 		x += delta_x;
 		y += delta_y;
 	}
+	
+	String getMove(int stepsToBuildWalls, Prey prey) {
+		return "";
+	}	
 }
 
 class BoardStates {
@@ -142,13 +159,13 @@ class BoardStates {
 		walls = new Wall[24];
 
 		for (int i = 0; i < 20; i++) {
-			walls[i] = new Wall(-100, 0);
+			walls[i] = new Wall(-100, 0, 0, 0, 0, 0);
 		}
 
-		walls[20] = new Wall(0, 0);
-		walls[21] = new Wall(500, 1);
-		walls[22] = new Wall(500, 0);
-		walls[23] = new Wall(0, 1);
+		walls[20] = new Wall(0, 0, 0, 0, 0, 499);
+		walls[21] = new Wall(500, 1, 0, 499, 0, 0);
+		walls[22] = new Wall(500, 0, 0, 499, 499, 499);
+		walls[23] = new Wall(0, 1, 499, 499, 0, 499);
 	}
 
   public BoardStates(Wall[] walls){
@@ -158,13 +175,13 @@ class BoardStates {
 
 public class EvasionGame {
 	public  BoardStates board;
-	public  Hunter hunter;
+	public  ZachHunter hunter;
 	public  Prey prey;
 	public  boolean caught;
 	public static final int RADIUS = 4;
 	public  boolean turn;
 	public  int[][] availableArea;
-  private int stepsToBuildWalls;
+  public int stepsToBuildWalls;
   public int m;
   public int n;
 
@@ -173,12 +190,12 @@ public class EvasionGame {
 		turn = true;
 		caught = false;
 		board = new BoardStates();
-		hunter = new Hunter(50, 50, board, MoveType.SE);
+		hunter = new ZachHunter(50, 50, board, MoveType.SE, n, m);
 		prey = new Prey(320, 200, board);
 		availableArea = new int[2][2];
 	}
 
-  public EvasionGame(BoardStates board, Hunter hunter, Prey prey, int n, int m, int stepsToBuildWalls){
+  public EvasionGame(BoardStates board, ZachHunter hunter, Prey prey, int n, int m, int steps){
     this.board = board;
     this.hunter = hunter;
     this.prey = prey;
@@ -187,7 +204,7 @@ public class EvasionGame {
     availableArea = new int[2][2];
     this.m = m;
     this.n = n;
-    this.stepsToBuildWalls = stepsToBuildWalls;
+    this.stepsToBuildWalls = steps;
   }
 
   public static EvasionGame constructGame(String message, int n, int m){
@@ -197,12 +214,13 @@ public class EvasionGame {
     BoardStates bs = new BoardStates();
     for(int i = 0; i < wallMount; i++){
       bs.walls[i] = parseWall(messArr[2 + i]);
+      bs.walls[i].status = 1;
     }
     // System.out.println(messArr[2 + wallMount]);
 
     int stepsToBuildWalls = Integer.parseInt(messArr[3 + wallMount]);
-
-    Hunter hunter = parseHunter(messArr[4 + wallMount], bs);
+	
+    ZachHunter hunter = parseZachHunter(messArr[4 + wallMount], bs, n, m);
     Prey prey = parsePrey(messArr[5 + wallMount], bs);
 
     return new EvasionGame(bs, hunter, prey, n, m, stepsToBuildWalls);
@@ -214,7 +232,6 @@ public class EvasionGame {
     int indexOfRightBrac = str.indexOf(")");
     int x1 = Integer.parseInt(str.substring(indexOfLeftBrac + 1, indexOfFirstComm));
     int y1 = Integer.parseInt(str.substring(indexOfFirstComm + 1, indexOfRightBrac));
-
     indexOfLeftBrac = str.indexOf("(", indexOfRightBrac);
     indexOfFirstComm = str.indexOf(",", indexOfLeftBrac);
     indexOfRightBrac = str.indexOf(")", indexOfFirstComm);
@@ -222,15 +239,15 @@ public class EvasionGame {
     int y2 = Integer.parseInt(str.substring(indexOfFirstComm + 1, indexOfRightBrac));
 
     if(x1 == x2){
-      return new Wall(x1, 1);
+      return new Wall(x1, 1, x1, x2, y1, y2);
     }else{
-      return new Wall(y1, 0);
+      return new Wall(y1, 0, x1, x2, y1, y2);
     }
 
   }
 
-  public static Hunter parseHunter(String str, BoardStates bs){
-    // System.out.println("Hunter:" + str);
+  public static ZachHunter parseZachHunter(String str, BoardStates bs, int n, int m){
+    // System.out.println("ZachHunter:" + str);
     int indexOfFirstWhiteSpace = str.indexOf(" ");
 
     int indexOfSecondWhiteSpace = str.indexOf(" ", indexOfFirstWhiteSpace + 1);
@@ -242,7 +259,7 @@ public class EvasionGame {
 
     int x = Integer.parseInt(str.substring(indexOfLeftBrac + 1, indexOfComm));
     int y = Integer.parseInt(str.substring(indexOfComm + 1, indexOfRightBrac));
-    return new Hunter(x, y, bs, type);
+    return new ZachHunter(x, y, bs, type, n, m);
   }
 
   public static Prey parsePrey(String str, BoardStates bs){
@@ -256,11 +273,19 @@ public class EvasionGame {
   }
 
 
+  public String getMoveOfHunter( ){
+    return hunter.getMove(stepsToBuildWalls,prey);
+    //return hunter.type + "h" + hunter.wallCoords(true) + "\n";
+  }
+
   public String getMoveOfPrey(){
     // get hunter info
     int hunterX = hunter.x;
     int hunterY = hunter.y;
     MoveType direction = hunter.type;
+
+    // used as copy of hunter
+    Hunter clone = null;
 
     //get prey info
     int preyX = prey.x;
@@ -274,7 +299,7 @@ public class EvasionGame {
     for(Wall wall:board.walls){
       if(wall.position >= 0){
         // horizontal
-        if(wall.direction == 0){
+        if(wall.direction == 1){
           if(wall.position > preyX && wall.position < maxX){
             maxX = wall.position;
           }
@@ -296,18 +321,69 @@ public class EvasionGame {
     System.out.println("HUNTER POSITION->" + hunterX + ", " + hunterY);
     System.out.println("PREY AREA->" + minX + "-" + maxX + "," + minY + "-" + maxY);
 
+
+    // check wheter current area narrow enough (<= RADIUS )
+    boolean isWidthLessThanRadius = false;
+    if(maxX - minX <= 4 || maxY - minY <= 4){
+      isWidthLessThanRadius = true;
+    }
+
     // check whether prey and hunter same side
     boolean isSameSide = true;
     if(hunterX < minX || hunterX > maxX || hunterY < minY || hunterY > maxY){
       isSameSide = false;
     }
 
+    if(isWidthLessThanRadius){
+      // If same side, run away as far as possible
+      if(isSameSide){
+        if(maxX - minX <= 4){
+          if(preyY - hunterY > 0){
+            return "SS";
+          }else{
+            return "NN";
+          }
+        }else{
+          if(preyX - hunterX > 0){
+            return "EE";
+          }else{
+            return "WW";
+          }
+        }
+      }
+    }
+
+
+
     // If not, try to move towards to current area's center
     if(!isSameSide){
       System.out.println("HUNTER AND PREY NOT SAME SIDE");
-      int centerX = (minX + maxX) / 2;
-      int centerY = (minY + maxY) / 2;
-      return moveTowards(centerX, centerY, preyX, preyY);
+      int targetX = (minX + maxX) / 2;
+      int targetY = (minY + maxY) / 2;
+      if(hunterX > maxX && hunterY >= minY && hunterY <= maxY){
+        targetX = maxX;
+      }else if(hunterX < minX && hunterY >= minY && hunterY <= maxY){
+        targetX = minX;
+      }else if(hunterX >= minX && hunterX <= maxX && hunterY > maxY){
+        targetY = maxY;
+      }else if(hunterX >= minX && hunterX <= maxX && hunterY < minY){
+        targetY = minY;
+      }else if(hunterX >= maxX && hunterY >= maxY){
+        targetX = maxX;
+        targetY = maxY;
+      }else if(hunterX >= maxX && hunterY <= minY){
+        targetX = maxX;
+        targetY = minY;
+      }else if(hunterX <= minX && hunterY >= maxY){
+        targetX = minX;
+        targetY = maxY;
+      }else if(hunterX <= minX && hunterY <= minY){
+        targetX = minX;
+        targetY = minY;
+      }
+      
+      // can optimize here
+      return moveTowards(targetX, targetY, preyX, preyY);
     }
 
     // check whether the hunter will hit the wall before next build
@@ -375,8 +451,9 @@ public class EvasionGame {
     boolean willHunterCatchPrey = false;
     double nearestDistance = Double.MAX_VALUE;
     int stepsToCatch = 0;
-    Hunter clone = new Hunter(hunterX, hunterY, board, direction);
+    clone = new Hunter(hunterX, hunterY, board, direction);
     for(int i = 0; i < stepsleft / 2; i++){
+      // BUG HERE
       clone.bounceMove();
       double dist = getDistance(preyX, preyY, clone.x, clone.y);
       if(dist < nearestDistance){
@@ -450,10 +527,20 @@ public class EvasionGame {
           return "ZZ";
       }
     }else{
-      return direction.name();
+      switch(direction){
+        case NE:
+          return "SW";
+        case NW:
+          return "SE";
+        case SE:
+          return "NW";
+        case SW:
+          return "NE";
+        default:
+          return "ZZ";
+      }
     }
 
-    // return "ZZ";
   }
 
   // best way to move towards specific point
@@ -478,7 +565,7 @@ public class EvasionGame {
     }
 
     double angle = Math.abs(((double) diffX) / diffY);
-    if(angle > 2.0 || angle < 0.5){
+    if(angle > 0.3 && angle < 3.0){
       if(diffX > 0 && diffY > 0){
         return "NW";
       }else if(diffX > 0 && diffY < 0){
@@ -518,10 +605,6 @@ public class EvasionGame {
     int disX = x1 - x2;
     int disY = y1 - y2;
     return Math.sqrt(disX * disX + disY * disY);
-  }
-
-  public String getMoveOfHunter(){
-    return "";
   }
 
 }
