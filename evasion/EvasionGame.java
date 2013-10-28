@@ -267,8 +267,8 @@ public class EvasionGame {
     int preyY = prey.y;
 
     //get available area for prey to move
-    int minX = Integer.MAX_VALUE; // smallest x prey can move to
-    int minY = Integer.MAX_VALUE; // smallest y prey can move to
+    int minX = Integer.MIN_VALUE; // smallest x prey can move to
+    int minY = Integer.MIN_VALUE; // smallest y prey can move to
     int maxX = Integer.MAX_VALUE;
     int maxY = Integer.MAX_VALUE;
     for(Wall wall:board.walls){
