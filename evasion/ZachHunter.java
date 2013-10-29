@@ -40,14 +40,14 @@ public class ZachHunter extends Hunter {
 				if( !wallSeparatesPrey( w, prey ) )
 					continue;
 				if( w.direction == 0 ) {				
-					if( (this.y < w.position) && (this.y + (2*this.delta_y) >= w.position) )
+					if( (this.y < w.position) && (this.y + (1*this.delta_y) >= w.position) )
 						return idx;
-					if( (this.y > w.position) && (this.y + (2*this.delta_y) <= w.position) )
+					if( (this.y > w.position) && (this.y + (1*this.delta_y) <= w.position) )
 						return idx;								
 				} else {
-					if( (this.x < w.position) && (this.x + (2*this.delta_x) >= w.position) )
+					if( (this.x < w.position) && (this.x + (1*this.delta_x) >= w.position) )
 						return idx;
-					if( (this.x > w.position) && (this.x + (2*this.delta_x) <= w.position) )
+					if( (this.x > w.position) && (this.x + (1*this.delta_x) <= w.position) )
 						return idx;		
 					/*							
 					if( Math.abs(this.x - w.position) <= 40 ) {
@@ -134,9 +134,9 @@ public class ZachHunter extends Hunter {
 	}
 	String translateCoords( boolean horizontal, Prey prey ) {
 		int x1 = 0;
-		int x2 = 499;
+		int x2 = 500;
 		int y1 = 0;
-		int y2 = 499;
+		int y2 = 500;
 		if( horizontal ) {
 			y1 = this.y;
 			y2 = this.y;
