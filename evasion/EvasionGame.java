@@ -278,7 +278,45 @@ public class EvasionGame {
     //return hunter.type + "h" + hunter.wallCoords(true) + "\n";
   }
 
+  String dodge( int x, int y ) {
+  	ZachHunter clone = new ZachHunter( hunter );
+  	int quad[] = prey.enclosingQuadrangle( );
+  	int minY = quad[0] + 1;
+  	int minX = quad[2] + 1;
+  	int avoid[][] = new int[16][2];
+  	for( int i = 0; i < 16; i++ ) {
+  		avoid[i][0] = clone.x;
+  		avoid[i][1] = clone.y;
+  		clone.bounceMove( );  		
+  	} 
+  	int besty = 0;
+  	int bestx = 0;
+  	for( int row = Math.max(prey.y-4,quad[0]); row < Math.min(prey.y+4,quad[1]); row++ ) {
+	  	for( int col = Math.max(prey.x-4,quad[2]); col < Math.min(prey.x+4,quad[3]); col++ ) {  	
+	  		int ydist = 100;
+	  		int xdist = 100;	  		
+	  		for( int a[ ] : avoid ) {
+	  			ydist = Math.min(ydist,Math.abs(row-a[1]));
+	  			xdist = Math.min(xdist,Math.abs(col-a[0]));	  			
+	  		}	  		
+	  		if( ydist >= besty && xdist >= bestx ) {
+	  			besty = ydist;
+	  			bestx = xdist;
+	  			minX = col;
+	  			minY = row;
+	  		}
+	  	}
+  	}  	
+  	return moveTowards(minX, minY, prey.x, prey.y);
+  }
+
   public String getMoveOfPrey(){
+  	
+    // If hunter nearby
+    if( Math.abs(prey.x-hunter.x) <= 16 && Math.abs(prey.y-hunter.y) <= 16)
+      return dodge(prey.x, prey.y);
+  	
+  	
     // get hunter info
     int hunterX = hunter.x;
     int hunterY = hunter.y;
