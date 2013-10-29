@@ -84,6 +84,34 @@ class Prey extends Player {
 		this.y = new_y;
 
 	}
+	
+	public int[ ] enclosingQuadrangle( ) {
+		int top = 0;
+		int left = 0;
+		int right = 499;
+		int bottom = 499;
+		for( Wall wall : b.walls ) {
+			if( wall.status == 0 )
+				continue;
+			if( wall.direction == 0 ) { // horizontal
+				if( wall.position < this.y && wall.position > top )
+					if( wall.x1 < this.x && wall.x2 > this.x )
+								top = wall.position;
+				if( wall.position > this.y && wall.position < bottom )
+					if( wall.x1 < this.x && wall.x2 > this.x )			
+						bottom = wall.position;
+			} else { // vertical
+				if( wall.position < this.x && wall.position > left )
+					if( wall.y1 < this.y && wall.y2 > this.y )				
+						left = wall.position;
+				if( wall.position > this.x && wall.position < right )
+					if( wall.y1 < this.y && wall.y2 > this.y )		
+						right = wall.position;			
+			}
+		}
+		return new int[]{top,bottom,left,right};
+	}	
+	
 }
 
 enum MoveType{
