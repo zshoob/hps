@@ -383,9 +383,9 @@ public class EvasionGame {
       }
     }
 
-    System.out.println("PREY POSITION->" + preyX + ", " + preyY);
-    System.out.println("HUNTER POSITION->" + hunterX + ", " + hunterY);
-    System.out.println("PREY AREA->" + minX + "-" + maxX + "," + minY + "-" + maxY);
+    // System.out.println("PREY POSITION->" + preyX + ", " + preyY);
+    // System.out.println("HUNTER POSITION->" + hunterX + ", " + hunterY);
+    // System.out.println("PREY AREA->" + minX + "-" + maxX + "," + minY + "-" + maxY);
 
 
     // check wheter current area narrow enough (<= RADIUS )
@@ -423,7 +423,7 @@ public class EvasionGame {
 
     // If not, try to move towards to current area's center
     if(!isSameSide){
-      System.out.println("HUNTER AND PREY NOT SAME SIDE");
+      // System.out.println("HUNTER AND PREY NOT SAME SIDE");
       int targetX = (minX + maxX) / 2;
       int targetY = (minY + maxY) / 2;
       if(hunterX > maxX && hunterY >= minY && hunterY <= maxY){
@@ -535,7 +535,7 @@ public class EvasionGame {
     // If hunter will catch preyer
     if(willHunterCatchPrey){
       if(isHunterTowardsPrey){
-        System.out.println("Towards Prey and Will Catch");
+        // System.out.println("Towards Prey and Will Catch");
         double angle = 0.0;
         angle = Math.abs(((double)(preyY - hunterY))/(preyX - hunterX));
         boolean isAngleLessThan45 = true;
@@ -571,7 +571,7 @@ public class EvasionGame {
             return "ZZ";
         }
       }else{
-        System.out.println("Very rare case happens");
+        // System.out.println("Very rare case happens");
         // Will think how to move here
       }
     }
