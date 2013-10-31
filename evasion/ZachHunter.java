@@ -251,7 +251,7 @@ public class ZachHunter extends Hunter {
 		if( wall >= 0 ) {
 			String wallstr = Integer.toString(wall+1);
 			move.append( "wx" + wallstr + "\n" );
-			System.out.println(move.toString( ));
+			// System.out.println(move.toString( ));
 			return move.toString( );
 		}
 		if( stepsToBuildWalls > 0 || critDistance(prey) ) {

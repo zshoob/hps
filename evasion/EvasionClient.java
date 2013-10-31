@@ -39,7 +39,7 @@ public class EvasionClient{
       if(count == 1){
         total = Integer.parseInt(data) + 6;
       }
-      System.out.println(data);
+      // System.out.println(data);
       sb.append(data);
       sb.append("\n");
       if(count == total){
@@ -52,7 +52,7 @@ public class EvasionClient{
   }
 
   public static void sendSocket(PrintWriter out, String text){
-    System.out.println("Sending : " + text);
+    //System.out.println("Sending : " + text);
     out.println(text);
   }
 
@@ -65,7 +65,7 @@ public class EvasionClient{
       port = Integer.parseInt(args[1].trim());
     }
 
-    System.out.printf("%d %s\n",port,teamName);
+    // System.out.printf("%d %s\n",port,teamName);
 
     try{
       sock = new Socket(host,port);
@@ -80,7 +80,7 @@ public class EvasionClient{
       String setupInfo = in.readLine().trim();
       int n = Integer.parseInt(setupInfo.substring(0, setupInfo.indexOf(" ")));
       int m = Integer.parseInt(setupInfo.substring(setupInfo.indexOf(" ") + 1));
-      System.out.printf("M:%d N%d %n", m, n);
+      // System.out.printf("M:%d N%d %n", m, n);
 
       while(true){
         String inputInfo = readSocket(in);
