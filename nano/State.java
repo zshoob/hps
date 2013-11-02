@@ -1,10 +1,13 @@
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.io.*;
 
 public class State {
 	public static void main( String args[ ] ) {
-		State state = new State( readTestInput(true) );
-		state.update( readTestInput(false) );
+		State state = new State(readTestInput(true));
+		Node node = state.nodes[87];		
+		Muncher m = state.bestMuncherAtNode(node);
+		
 	}
 	public State( String input ) {
 		nodes = new Node[200]; // max size
@@ -30,11 +33,11 @@ public class State {
 					u.left = v;
 					v.right = u;
 				} else if( u.yloc < v.yloc ) {
-					u.down = v;
-					v.up = u;				
+					u.up = v;					
+					v.down = u;			
 				} else {
-					u.up = v;
-					v.down = u;
+					u.down = v;
+					v.up = u;
 				}
 			}
 		}
@@ -43,6 +46,21 @@ public class State {
 		this.redMunchers = new Node[0];
 		this.blueScore = 0;
 		this.redScore = 0;
+	}
+	public State( State o ) {
+		this.nodes = new Node[o.nodes.length];
+		for( int i = 0; i < this.nodes.length; i++ ) 
+			this.nodes[i] = new Node(o.nodes[i]);
+		this.blueMunchers = new Muncher[o.blueMunchers.length];
+		for( int i = 0; i < this.blueMunchers.length; i++ ) 
+			this.blueMunchers[i] = new Muncher(o.blueMunchers[i]);		
+		this.redMunchers = new Node[o.redMunchers.length];
+		for( int i = 0; i < this.redMunchers.length; i++ ) 
+			this.redMunchers[i] = new Node(o.redMunchers[i]);			
+		this.blueScore = o.blueScore;
+		this.redScore = o.redScore;
+		this.playersRemaining = o.playersRemaining;
+		this.timeLeft = o.timeLeft;
 	}
 	public void update( String input ) {
 		String lines[ ] = input.split("\n");
@@ -69,6 +87,43 @@ public class State {
 		String etc[ ] = lines[4].split(",");		
 		this.playersRemaining = Integer.parseInt(etc[0]);
 		this.timeLeft = Integer.parseInt(etc[1]);
+	}
+	Muncher bestMuncherAtNode( Node node ) {
+		String bestProgram = null;
+		int max = 0;
+		for( String program : Muncher.allPrograms ) {
+			System.out.println(program);
+			int score = numMunchableNodes(node, program, 0, new LinkedList<Integer>( ), 0);
+			System.out.println(score);			
+			if( score > max ) {
+				max = score;
+				bestProgram = program;
+			}	
+		}
+		return new Muncher( node, bestProgram, 0 );
+	}
+	static int numMunchableNodes( Node node, String program, int counter, 
+						   LinkedList<Integer> visited, int num ) {
+		visited.add(node.id);
+		for( int i = 0; i < 4; i++ ) {
+			char instruction = program.charAt(counter);
+			Node n = null;
+			switch( instruction ) {
+				case 'u': n = node.up; break;
+				case 'd': n = node.down; break;				
+				case 'l': n = node.left; break;				
+				case 'r': n = node.right; break;				
+			}
+			counter = (counter+1)%4;
+			//System.out.println( "here" );
+			//if( n != null )
+			//	n.view( );
+			if( !(n == null || n.munched || visited.contains(n.id)) ) {
+				return numMunchableNodes( n, program, counter, 
+										  visited, num+1 );
+			}
+		}
+		return num;
 	}
 	static String readTestInput( boolean init ) {
 		String out = "";
