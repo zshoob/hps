@@ -13,6 +13,18 @@ public class Node {
 		this.yloc = o.yloc;
 		this.munched = o.munched;
 	}
+	LinkedList<Node> activeSiblings( ) {
+		LinkedList<Node> sibs = new LinkedList<Node>( );
+		if( this.up != null && !this.up.munched )
+			sibs.add(this.up);
+		if( this.down != null && !this.down.munched )
+			sibs.add(this.down);
+		if( this.left != null && !this.left.munched )
+			sibs.add(this.left);
+		if( this.right != null && !this.right.munched )
+			sibs.add(this.right);			
+		return sibs;						
+	}
 	public void view( ) {
 		System.out.println( this.id + ":\t(" + this.xloc + "," + this.yloc + ")" );
 	}
