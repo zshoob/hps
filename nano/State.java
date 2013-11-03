@@ -5,9 +5,8 @@ import java.io.*;
 public class State {
 	public static void main( String args[ ] ) {
 		State state = new State(readTestInput(true));
-		Node node = state.nodes[87];		
-		Muncher m = state.bestMuncherAtNode(node);
-		
+		state.update(readTestInput(false));		
+		System.out.println(state.getTurn( ));
 	}
 	public State( String input ) {
 		nodes = new Node[200]; // max size
@@ -16,6 +15,8 @@ public class State {
 		for( String line : lines ) {
 			if( line.length( ) == 0 )
 				break;
+			if( line.charAt(0) == 'n' )
+				continue;
 			String tokens[ ] = line.split(",");
 			if( tokens.length == 3 ) { // node spec
 				int id = Integer.parseInt(tokens[0]);
@@ -49,14 +50,26 @@ public class State {
 	}
 	public State( State o ) {
 		this.nodes = new Node[o.nodes.length];
-		for( int i = 0; i < this.nodes.length; i++ ) 
+		for( int i = 0; i < this.nodes.length; i++ )
 			this.nodes[i] = new Node(o.nodes[i]);
+		for( int i = 0; i < o.nodes.length; i++ ) {
+			if( o.nodes[i].up != null )
+				this.nodes[i].up = this.nodes[o.nodes[i].up.id];
+			if( o.nodes[i].down != null )
+				this.nodes[i].down = this.nodes[o.nodes[i].down.id];				
+			if( o.nodes[i].left != null )
+				this.nodes[i].left = this.nodes[o.nodes[i].left.id];				
+			if( o.nodes[i].right != null )
+				this.nodes[i].right = this.nodes[o.nodes[i].right.id];				
+		}
 		this.blueMunchers = new Muncher[o.blueMunchers.length];
-		for( int i = 0; i < this.blueMunchers.length; i++ ) 
+		for( int i = 0; i < this.blueMunchers.length; i++ ) {
 			this.blueMunchers[i] = new Muncher(o.blueMunchers[i]);		
+			this.blueMunchers[i].loc = this.nodes[o.blueMunchers[i].loc.id];	
+		}
 		this.redMunchers = new Node[o.redMunchers.length];
-		for( int i = 0; i < this.redMunchers.length; i++ ) 
-			this.redMunchers[i] = new Node(o.redMunchers[i]);			
+		for( int i = 0; i < this.redMunchers.length; i++ )
+			this.redMunchers[i] = this.nodes[o.redMunchers[i].id];
 		this.blueScore = o.blueScore;
 		this.redScore = o.redScore;
 		this.playersRemaining = o.playersRemaining;
@@ -64,45 +77,92 @@ public class State {
 	}
 	public void update( String input ) {
 		String lines[ ] = input.split("\n");
-		String munched[ ] = lines[0].substring(2).split(",");
-		for( String nodestr : munched )
-			this.nodes[Integer.parseInt(nodestr)].munched = true;
-		String blue[ ] = lines[1].substring(2).split(",");
-		this.blueMunchers = new Muncher[blue.length];
-		int idx = 0;
-		for( String m : blue ) {
-			String muncher[ ] = m.split("/");
-			Node loc = nodes[Integer.parseInt(muncher[0])];
-			String program = muncher[1];
-			int counter = Integer.parseInt(muncher[2]);
-			this.blueMunchers[idx++] = new Muncher(loc, program, counter);
+		if( lines.length < 3 )
+			return;
+		if( lines[0].length( ) > 1 ) {
+			String munched[ ] = lines[0].substring(lines[0].indexOf(":")+1).split(",");
+			for( String nodestr : munched )
+				this.nodes[Integer.parseInt(nodestr)].munched = true;
 		}
-		String red[ ] = lines[2].substring(2).split(",");		
-		this.redMunchers = new Node[red.length];
-		for( idx = 0; idx < red.length; idx++ )
-			this.redMunchers[idx] = this.nodes[Integer.parseInt(red[idx])];
+		if( lines[1].length( ) > 1 ) {
+			String blue[ ] = lines[1].substring(2).split(",");
+			this.blueMunchers = new Muncher[blue.length];
+			int idx = 0;
+			for( String m : blue ) {
+				String muncher[ ] = m.split("/");
+				Node loc = nodes[Integer.parseInt(muncher[0])];
+				String program = muncher[1];
+				int counter = Integer.parseInt(muncher[2]);
+				this.blueMunchers[idx++] = new Muncher(loc, program, counter);
+			}
+		} else {
+			this.blueMunchers = new Muncher[0];
+		}
+		if( lines[2] .length( ) > 1 ) {
+			String red[ ] = lines[2].substring(2).split(",");		
+			this.redMunchers = new Node[red.length];
+			for( int idx = 0; idx < red.length; idx++ )
+				this.redMunchers[idx] = this.nodes[Integer.parseInt(red[idx])];
+		} else {
+			this.redMunchers = new Node[0];
+		}
 		String scores[ ] = lines[3].split(",");
 		this.blueScore = Integer.parseInt(scores[0]);
 		this.redScore = Integer.parseInt(scores[1]);		
 		String etc[ ] = lines[4].split(",");		
 		this.playersRemaining = Integer.parseInt(etc[0]);
 		this.timeLeft = Integer.parseInt(etc[1]);
+	}	
+	public String getTurn( ) {
+		if( redMunchers.length == 0 )
+			return "0";
+		String out = "";
+		int count = 0;
+		for( int i = 0; i < redMunchers.length; i++ ) {
+			Muncher m = chokeRedMuncher( this, redMunchers[i] );
+			if( m != null ) {
+				out += m.loc.id + "/" + m.program + ",";
+				count++;
+			}
+		}
+		out = out.substring(0,out.length( )-1);
+		return count + ":" + out + "\n";
 	}
-	Muncher bestMuncherAtNode( Node node ) {
-		String bestProgram = null;
+	static public Muncher chokeRedMuncher( State state, Node redNode ) {
 		int max = 0;
+		Muncher bestMuncher = null;
+		for( Node node : redNode.activeSiblings( ) ) {
+			Muncher m = bestMuncherAtNode(state, node);
+			int score = numMunchableNodes(state, node, m.program);
+			if( score > max ) {
+				max = score;
+				bestMuncher = m;
+			}
+		}
+		return bestMuncher;
+	}
+	static Muncher bestMuncherAtNode( State state, Node node ) {
+		String bestProgram = null;
+		int max = -1;
 		for( String program : Muncher.allPrograms ) {
-			System.out.println(program);
-			int score = numMunchableNodes(node, program, 0, new LinkedList<Integer>( ), 0);
-			System.out.println(score);			
+			int score = numMunchableNodes(state, node, program);
 			if( score > max ) {
 				max = score;
 				bestProgram = program;
 			}	
 		}
+		System.out.println(bestProgram);
+		if( bestProgram == null )
+			return new Muncher( node, "udlr", 0 );
 		return new Muncher( node, bestProgram, 0 );
 	}
-	static int numMunchableNodes( Node node, String program, int counter, 
+	static int numMunchableNodes( State state, Node node, String program ) {
+		LinkedList<Integer> visited = new LinkedList<Integer>( );
+		for( Node n : state.redMunchers ) 
+			visited.add(n.id);
+		return numMunchableNodesInner(node, program, 0, visited, 0);
+	}	
+	static int numMunchableNodesInner( Node node, String program, int counter, 
 						   LinkedList<Integer> visited, int num ) {
 		visited.add(node.id);
 		for( int i = 0; i < 4; i++ ) {
@@ -115,16 +175,36 @@ public class State {
 				case 'r': n = node.right; break;				
 			}
 			counter = (counter+1)%4;
-			//System.out.println( "here" );
-			//if( n != null )
-			//	n.view( );
 			if( !(n == null || n.munched || visited.contains(n.id)) ) {
-				return numMunchableNodes( n, program, counter, 
-										  visited, num+1 );
+				return numMunchableNodesInner( n, program, counter, visited, num+1 );
 			}
 		}
+		return num+1;
+	}
+	/*
+	static int numMunchableNodes( State state, int loc, String program ) {
+		State copy = new State(state);
+		Muncher reds[ ] = new Muncher[state.redMunchers.length];
+		for( int i = 0; i < reds.length; i++ ) {
+			reds[i] = bestMuncherAtNodeSimple(copy.redMunchers[i]);
+		}
+		Node node = copy.nodes[loc];
+		Muncher m = new Muncher(node, program, 0);
+		return numMunchableNodes( state, m, reds );
+	}
+	static int numMunchableNodes( State state, Muncher muncher, Muncher reds[ ] ) {
+	
+		int num = 0;
+		while( !muncher.starved ) {
+			for( Muncher m : reds ) 
+				m.run( );
+			muncher.run( );			
+			muncher.loc.view( );
+			num++;
+		}		
 		return num;
 	}
+	*/
 	static String readTestInput( boolean init ) {
 		String out = "";
 		try {
