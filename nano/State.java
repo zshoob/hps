@@ -189,6 +189,7 @@ public class State {
 		if( redRemaining == 0 ) 
 			return greedyTurn( );
 		int numToBlock = (numMunchers-redRemaining) - numBlocked;
+		System.out.println( "red remaining: " + redRemaining + "\tnum to block: " + numToBlock );		
 		if( numToBlock == 0 )
 			return "0";	
 		LinkedList<Muncher> mList = new LinkedList<Muncher>( );		
@@ -210,7 +211,7 @@ public class State {
 			out += m.loc.id + "/" + m.program + ",";
 		out = out.substring(0,out.length( )-1);
 		return out;		
-	}	
+	}
 	*/
 	static public Muncher blockRedMuncher( State state, Node redNode ) {
 		int max = 0;
