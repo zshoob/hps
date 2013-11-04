@@ -34,12 +34,6 @@ public class OffByOne {
     }
     public String receive( ) throws IOException {
         StringBuffer sb = new StringBuffer( );
-        /*
-        String temp;
-        while (!(temp = in.readLine( )).equalsIgnoreCase("<EOM>")) {
-            sb.append(temp + "\n");
-        }
-        */
         String temp = in.readLine( );
         while( !(temp == null || temp.equalsIgnoreCase("<EOM>")) ) {
 			sb.append(temp + "\n");        	
@@ -47,8 +41,10 @@ public class OffByOne {
         }
         if( sb.length( ) > 0 )
 	        sb.deleteCharAt(sb.length( ) - 1);
-        System.out.println("receive:");
-        System.out.println(sb.toString( ));
+	    if( sb.length( ) <= 500 ) {
+	        System.out.println("receive:");
+    	    System.out.println(sb.toString( ));
+    	}
         return sb.toString( );
     }
     public void send(String str) {
