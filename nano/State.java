@@ -88,8 +88,7 @@ public class State {
 			String munched[ ] = lines[0].substring(lines[0].indexOf(":")+1).split(",");
 			for( String nodestr : munched ) {
 				String tokens[ ] = nodestr.split("/");
-				for( String t : tokens ) {
-					this.spawnloc.add(Integer.parseInt(t));				
+				for( String t : tokens ) {		
 					this.nodes[Integer.parseInt(t)].munched = true;									
 				}
 			}
@@ -166,7 +165,7 @@ public class State {
 		String out = "";
 		int count = 0;
 		for( int i = 0; i < redMunchers.length; i++ ) {
-			Muncher m = chokeRedMuncher( this, redMunchers[i] );
+			Muncher m = blockRedMuncher( this, redMunchers[i] );
 			if( m != null ) {
 				if( numMunchableNodes(this, m.loc, m.program) <= 2 )
 					continue;
@@ -175,13 +174,45 @@ public class State {
 				count++;
 			}
 		}
-		spawnloc = new LinkedList<Integer>( );
 		if( out.length( ) == 0 )
 			return "0";
 		out = out.substring(0,out.length( )-1);
 		return count + ":" + out;
 	}
-	static public Muncher chokeRedMuncher( State state, Node redNode ) {
+	/*
+	public String getTurn( ) {
+		System.out.println( State.numMunchers );
+		if( State.turnZero ) {
+			State.turnZero = false;
+			return "0";
+		}	
+		if( redRemaining == 0 ) 
+			return greedyTurn( );
+		int numToBlock = (numMunchers-redRemaining) - numBlocked;
+		if( numToBlock == 0 )
+			return "0";	
+		LinkedList<Muncher> mList = new LinkedList<Muncher>( );		
+		for( Node redNode : redMunchers ) {
+			Muncher m = blockRedMuncher( this, redNode );
+			if( m == null || numMunchableNodes(this, m.loc, m.program) <= 2 )
+				continue;
+			m.value = numMunchableNodes(this, m.loc, m.program);
+			mList.add(m);
+		}
+		if( mList.size( ) == 0 )
+			return "0";
+		numBlocked += mList.size( );
+		Muncher mArray[ ] = mList.toArray(new Muncher[0]);
+		Arrays.sort(mArray, Collections.reverseOrder( ));
+		mArray = Arrays.copyOf(mArray,Math.min(mArray.length, numToBlock));
+		String out = mArray.length + ":";
+		for( Muncher m : mArray )
+			out += m.loc.id + "/" + m.program + ",";
+		out = out.substring(0,out.length( )-1);
+		return out;		
+	}	
+	*/
+	static public Muncher blockRedMuncher( State state, Node redNode ) {
 		int max = 0;
 		Muncher bestMuncher = null;
 		for( Node node : redNode.activeSiblings( ) ) {
@@ -278,7 +309,6 @@ public class State {
 	Node nodes[ ];
 	Muncher blueMunchers[ ];	
 	Node redMunchers[ ];
-	static int numBlocked = 0;
 	static boolean turnZero = true;
 	int blueScore;
 	int redScore;
