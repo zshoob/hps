@@ -22,7 +22,7 @@ public class OffByOne {
         out = new PrintWriter(client.getOutputStream( ), true);
         in = new BufferedReader(new InputStreamReader(client.getInputStream( )));        
         send("OffByOne");
-        send("0");
+        //send("0");
         State state = new State(receive( ));
         while(true) {
         	String input = receive( );
