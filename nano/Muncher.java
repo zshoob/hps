@@ -23,8 +23,9 @@ public class Muncher implements Comparable<Muncher> {
 		else
 			return 1;
 	}
-	public void run( ) {
-		this.loc.munched = true;	
+	public void run(boolean andMunch) {
+		if( andMunch )
+			this.loc.munched = true;	
 		boolean starve = true;
 		for( int i = 0; i < 4; i++ ) {
 			char instruction = this.program.charAt(this.counter);
@@ -35,10 +36,19 @@ public class Muncher implements Comparable<Muncher> {
 				case 'l': node = this.loc.left; break;				
 				case 'r': node = this.loc.right; break;				
 			}
-			this.counter = (this.counter + 1) % 4;
+			//this.counter = (this.counter + 1) % 4;
+			System.out.print(instruction + " " + (node == null) + " " );
+			if( node != null )
+				System.out.print( node.munched + " " );
+			this.counter++;
+			if( this.counter == 4 )
+				this.counter = 0;
 			if( !(node == null || node.munched) ) {
+				System.out.println( );
+				node.view( );
 				starve = false;
 				this.loc = node;
+				lastMove = instruction;
 				break;
 			}
 		}
@@ -46,6 +56,37 @@ public class Muncher implements Comparable<Muncher> {
 			this.starved = true;
 		}
 	}
+	public void run( LinkedList<Node> visited ) {
+		boolean starve = true;
+		for( int i = 0; i < 4; i++ ) {
+			char instruction = this.program.charAt(this.counter);
+			Node node = null;
+			switch( instruction ) {
+				case 'u': node = this.loc.up; break;
+				case 'd': node = this.loc.down; break;				
+				case 'l': node = this.loc.left; break;				
+				case 'r': node = this.loc.right; break;				
+			}
+			//this.counter = (this.counter + 1) % 4;
+			System.out.print(instruction + " " + (node == null) + " " );
+			if( node != null )
+				System.out.print( node.munched + " " + node.visitedBy + " ");
+			this.counter++;
+			if( this.counter == 4 )
+				this.counter = 0;
+			if( !(node == null || node.munched || visited.contains(node)) ) {
+				System.out.println( );
+				node.view( );
+				starve = false;
+				this.loc = node;
+				lastMove = instruction;
+				break;
+			}
+		}
+		if( starve ) {
+			this.starved = true;
+		}
+	}	
 	static String[ ] allPrograms( ) {
 		char dirs[ ] = new char[ ]{'u','d','l','r'};
 		LinkedList<String> i = new LinkedList<String>( );
@@ -66,6 +107,7 @@ public class Muncher implements Comparable<Muncher> {
 	int counter;
 	final String program;
 	boolean starved;
+	char lastMove;
 	static String[ ] allPrograms = allPrograms( );	
 	int value;
 }
