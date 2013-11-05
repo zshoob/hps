@@ -155,33 +155,6 @@ public class State {
 		out = out.substring(0,out.length( )-1);
 		return count + ":" + out;
 	}
-	/*
-	public String getTurn( ) {
-		System.out.println( State.numMunchers );
-		if( State.turnZero ) {
-			State.turnZero = false;
-			return "0";
-		}	
-		if( redRemaining == 0 ) 
-			return greedyTurn( );
-		String out = "";
-		int count = 0;
-		for( int i = 0; i < redMunchers.length; i++ ) {
-			Muncher m = blockRedMuncher( this, redMunchers[i] );
-			if( m != null ) {
-				if( numMunchableNodes(this, m.loc, m.program) <= 2 )
-					continue;
-				out += m.loc.id + "/" + m.program + ",";
-				m.loc.view( );
-				count++;
-			}
-		}
-		if( out.length( ) == 0 )
-			return "0";
-		out = out.substring(0,out.length( )-1);
-		return count + ":" + out;
-	}
-	*/
 	public String getTurn( ) {
 		if( State.turnZero ) {
 			State.turnZero = false;
@@ -190,7 +163,7 @@ public class State {
 		if( numBlocked == numMunchers ) 
 			return greedyTurn( );
 		int numToBlock = (numMunchers-redRemaining) - numBlocked;
-		System.out.println( "red remaining: " + redRemaining + "\tnum to block: " + numToBlock );		
+		//System.out.println( "red remaining: " + redRemaining + "\tnum to block: " + numToBlock );		
 		if( numToBlock <= 0 )
 			return "0";	
 		LinkedList<Muncher> mList = new LinkedList<Muncher>( );		
@@ -210,7 +183,6 @@ public class State {
 		String out = mArray.length + ":";
 		for( Muncher m : mArray ) {
 			out += m.loc.id + "/" + m.program + ",";
-			System.out.println( "muncher score: " + m.value );
 		}
 		out = out.substring(0,out.length( )-1);
 		return out;		
@@ -219,9 +191,8 @@ public class State {
 		int max = 0;
 		Muncher bestMuncher = null;
 		for( Node node : redNode.activeSiblings( ) ) {
-			Muncher m = bestMuncherAtNode(state, node);
+			Muncher m = bestMuncherAtNode2(state, node);
 			int score = m.value;
-			System.out.println( "score: " + score );
 			if( score > max ) {
 				max = score;
 				bestMuncher = m;
@@ -270,6 +241,7 @@ public class State {
 		}
 		return num+1;
 	}
+	/*
 	static Muncher bestMuncherAtNode2( State state, Node node ) {
 		LinkedList<Muncher> redList = new LinkedList<Muncher>( );
 		for( Node redNode : state.redMunchers ) {
@@ -292,111 +264,130 @@ public class State {
 		out.value = max; 
 		return out;
 	}
-	static int numMunchableNodes2( State state, Node node, 
-								   String program, LinkedList<Muncher> mList ) {
-		for( Node n : state.nodes )
-			n.visitedBy = 0;
-		System.out.println(program);
-		System.out.print( "start: " );
-		node.view( );
-		Muncher blue = new Muncher( node, program, 0 );
-		mList.add(blue);
-		int num = 0;
-		LinkedList<Node> visited = new LinkedList<Node>( );
-		while( !blue.starved ) {
-			num++;
-			for( Muncher m : mList ) {
-					visited.add(m.loc);
-					if( m == blue )
-						m.loc.visitedBy = 1;
-					else
-						m.loc.visitedBy = 2;
-				if( !m.starved ) {
-					m.run( visited );
-				}
-			}
-			for( Muncher a : mList ) {
-				for( Muncher b : mList ) {
-					if( a == b )
-						continue;
-					if( a.loc == b.loc ) {
-						if( a.lastMove == 'u' )
-							b.starved = true;
-						else if( b.lastMove == 'u' )
-							a.starved = true;							
-						else if( a.lastMove == 'l' )
-							b.starved = true;														
-						else if( b.lastMove == 'l' )
-							a.starved = true;							
-						else if( a.lastMove == 'd' )
-							b.starved = true;														
-						else if( b.lastMove == 'd' )
-							a.starved = true;																																									
-						else if( a.lastMove == 'r' )
-							b.starved = true;														
-						else
-							a.starved = true;							
-					}
-				}
-			}	
-		}
-		System.out.print( num + "\n\n" );
-		return num;
-	}
-	/*
-	static int numMunchableNodes2( State state, Node node, 
-								   String program, LinkedList<Muncher> mList ) {
-		System.out.println(program);
-		System.out.print( "start: " );
-		node.view( );
-		State copy = new State(state);
-		//int count = 0;
-		//for( Node n : copy.nodes ) 
-		//	if( n.munched )
-		//		count++;
-		//System.out.println(count);
-		Muncher blue = new Muncher( copy.nodes[node.id], program, 0 );
-		for( Muncher m : mList )
-			m.loc = copy.nodes[m.loc.id];
-		mList.add(blue);
-		int num = 0;
-		while( !blue.starved ) {
-			num++;
-			for( Muncher m : mList ) {
-					m.loc.munched = true;		
-				if( !m.starved ) {
-					m.run(false);
-				}
-			}
-			for( Muncher a : mList ) {
-				for( Muncher b : mList ) {
-					if( a == b )
-						continue;
-					if( a.loc == b.loc ) {
-						if( a.lastMove == 'u' )
-							b.starved = true;
-						else if( b.lastMove == 'u' )
-							a.starved = true;							
-						else if( a.lastMove == 'l' )
-							b.starved = true;														
-						else if( b.lastMove == 'l' )
-							a.starved = true;							
-						else if( a.lastMove == 'd' )
-							b.starved = true;														
-						else if( b.lastMove == 'd' )
-							a.starved = true;																																									
-						else if( a.lastMove == 'r' )
-							b.starved = true;														
-						else
-							a.starved = true;							
-					}
-				}
-			}	
-		}
-		System.out.print( num + "\n\n" );
-		return num;
-	}
 	*/
+	static Muncher bestMuncherAtNode2( State state, Node node ) {
+		LinkedList<LinkedList<Node>> redPaths = new LinkedList<LinkedList<Node>>( );
+		for( Node redNode : state.redMunchers ) {
+			Muncher r = bestMuncherAtNode( state, redNode );
+			if( r != null ) {
+				LinkedList<Node> path = munchPath( r.loc, r.program );
+				redPaths.add(path);
+			}
+		}
+		for( Muncher b : state.blueMunchers ) {
+			LinkedList<Node> path = munchPath( b.loc, b.program );
+			redPaths.add(path);			
+		}
+		int max = 0;
+		String bestProgram = null;
+		for( String program : Muncher.allPrograms ) {
+			//System.out.println( "program: " + program );
+			//System.out.print( "start: " );
+			//node.view( );
+			LinkedList<Node> bluePath = munchPath( node, program );
+			//System.out.println( bluePath.size( ) + "\n\n" );
+			int score = realPathLength( bluePath, redPaths );
+			if( score >= max ) {
+				max = score;
+				bestProgram = program;
+			}
+		}
+		if( bestProgram == null )
+			return null;
+		Muncher out = new Muncher( node, bestProgram, 0 );
+		out.value = max; 
+		return out;
+	}	
+	static int realPathLength( LinkedList<Node> bluePath, LinkedList<LinkedList<Node>> redPaths ) {
+		boolean ignore[ ] = new boolean[redPaths.size( )];
+		int idx = 0;
+		for( Node bNode : bluePath ) {
+			int ridx = 0;
+			for( LinkedList<Node> redPath : redPaths ) {
+				for( int fidx = 0; fidx < Math.min(idx+1, redPath.size( )); fidx++ ) {
+					if( bNode == redPath.get(fidx) ) {
+						return idx-1;
+					}
+				}
+				//if( ignore[ridx++] || redPath.size( ) < idx + 1)
+				//	continue;				
+				if( redPath.size( ) < idx + 2)
+					continue;				
+				Node rNode = redPath.get(idx+1);
+				if( bNode.id == rNode.id && idx > 0 ) {
+					Node bPrev = bluePath.get(idx-1);
+					Node rPrev = redPath.get(idx-1);
+					if( bPrev.up != null && bPrev.up == bNode ) {
+						//ignore[ridx] = true;
+						LinkedList<Node> newRed = new LinkedList<Node>( );
+						for( int i = 0; i <= idx; i++ )
+							newRed.add(redPath.get(i));
+						redPath = newRed;
+						continue;
+					}
+					else if( rPrev.up != null && rPrev.up == rNode )
+						return idx-1;
+					else if( bPrev.left != null && bPrev.left == bNode ) {
+						LinkedList<Node> newRed = new LinkedList<Node>( );
+						for( int i = 0; i <= idx; i++ )
+							newRed.add(redPath.get(i));
+						redPath = newRed;						
+						continue;
+					}
+					else if( rPrev.left != null && rPrev.left == rNode )
+						return idx-1;						
+					else if( bPrev.down != null && bPrev.down == bNode ) {
+						//ignore[ridx] = true;
+						LinkedList<Node> newRed = new LinkedList<Node>( );
+						for( int i = 0; i <= idx; i++ )
+							newRed.add(redPath.get(i));
+						redPath = newRed;						
+						continue;
+					}
+					else if( rPrev.down != null && rPrev.down == rNode )
+						return idx-1;
+					else if( bPrev.right != null && bPrev.right == bNode ) {
+						//ignore[ridx] = true;
+						LinkedList<Node> newRed = new LinkedList<Node>( );
+						for( int i = 0; i <= idx; i++ )
+							newRed.add(redPath.get(i));
+						redPath = newRed;						
+						continue;
+					}
+					else
+						return idx-1;																								
+				}
+			}
+			idx++;
+		}
+		return idx;
+	}
+	static LinkedList<Node> munchPath( Node node, String program ) {
+		LinkedList<Node> path = new LinkedList<Node>( );
+		return munchPath( node, program, 0, path );
+	}
+	static LinkedList<Node> munchPath( Node node, String program, int counter, LinkedList<Node> path ) {
+		path.add(node);
+		for( int i = 0; i < 4; i++ ) {
+			char instruction = program.charAt(counter);
+			Node n = null;
+			switch( instruction ) {
+				case 'u': n = node.up; break;
+				case 'd': n = node.down; break;				
+				case 'l': n = node.left; break;				
+				case 'r': n = node.right; break;				
+			}
+			counter = (counter+1)%4;
+			//System.out.print( instruction + " " + (n == null) + " " + path.contains(n) + " " );
+			//if( n != null )
+			//	System.out.print( n.munched + " " );
+			if( !(n == null || n.munched || path.contains(n)) ) {
+			//	n.view( );
+				return munchPath( n, program, counter, path );
+			}
+		}
+		return path;		
+	}	
 	static String readTestInput( boolean init ) {
 		String out = "";
 		try {
