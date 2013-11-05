@@ -23,8 +23,8 @@ public class Muncher implements Comparable<Muncher> {
 		else
 			return 1;
 	}
-	public void run(boolean andMunch) {
-		if( andMunch )
+	public void run(boolean munch) {
+		if( munch )
 			this.loc.munched = true;	
 		boolean starve = true;
 		for( int i = 0; i < 4; i++ ) {
@@ -37,15 +37,15 @@ public class Muncher implements Comparable<Muncher> {
 				case 'r': node = this.loc.right; break;				
 			}
 			//this.counter = (this.counter + 1) % 4;
-			System.out.print(instruction + " " + (node == null) + " " );
-			if( node != null )
-				System.out.print( node.munched + " " );
+			//System.out.print(instruction + " " + (node == null) + " " );
+			//if( node != null )
+			//	System.out.print( node.munched + " " );
 			this.counter++;
 			if( this.counter == 4 )
 				this.counter = 0;
 			if( !(node == null || node.munched) ) {
-				System.out.println( );
-				node.view( );
+				//System.out.println( );
+				//node.view( );
 				starve = false;
 				this.loc = node;
 				lastMove = instruction;
