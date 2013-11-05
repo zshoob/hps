@@ -26,7 +26,7 @@ public class Node {
 		return sibs;						
 	}
 	public void view( ) {
-		System.out.println( this.id + ":\t(" + this.xloc + "," + this.yloc + ")" );
+		System.out.println( this.id + ":\t(" + this.xloc + "," + this.yloc + ")\tmunched:" + this.munched );
 	}
 	int id;
 	int xloc;
@@ -36,4 +36,5 @@ public class Node {
 	Node down;
 	Node left;
 	Node right;
+	int visitedBy = 0;
 }
