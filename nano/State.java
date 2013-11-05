@@ -6,9 +6,10 @@ import java.io.*;
 
 public class State {
 	public static void main( String args[ ] ) {
-		State state = new State(readTestInput(true));
+		State state = new State(readTestInput(true));		
 		state.update(readTestInput(false));		
-		System.out.println(state.getTurn( ));
+		State copy = new State(state);
+		System.out.println(state.nodes[0] == copy.nodes[0]);
 	}
 	public State( String input ) {
 		nodes = new Node[200]; // max size
@@ -35,7 +36,7 @@ public class State {
 				} else if( u.xloc > v.xloc ) {
 					u.left = v;
 					v.right = u;
-				} else if( u.yloc < v.yloc ) {
+				} else if( u.yloc > v.yloc ) {
 					u.up = v;					
 					v.down = u;			
 				} else {
@@ -108,7 +109,7 @@ public class State {
 			this.blueMunchers = new Muncher[0];
 		}
 		if( lines[2] .length( ) > 1 ) {
-			String red[ ] = lines[2].substring(2).split(",");		
+			String red[ ] = lines[2].substring(lines[2].indexOf(":")+1).split(",");		
 			this.redMunchers = new Node[red.length];
 			for( int idx = 0; idx < red.length; idx++ ) {
 				this.redMunchers[idx] = this.nodes[Integer.parseInt(red[idx])];
@@ -148,12 +149,13 @@ public class State {
 				count++;
 				out += bestMuncher.loc.id + "/" + bestMuncher.program + ",";
 				while( !bestMuncher.starved )
-					bestMuncher.run( );
+					bestMuncher.run(true);
 			}
 		}
 		out = out.substring(0,out.length( )-1);
 		return count + ":" + out;
 	}
+	/*
 	public String getTurn( ) {
 		System.out.println( State.numMunchers );
 		if( State.turnZero ) {
@@ -179,27 +181,26 @@ public class State {
 		out = out.substring(0,out.length( )-1);
 		return count + ":" + out;
 	}
-	/*
+	*/
 	public String getTurn( ) {
-		System.out.println( State.numMunchers );
 		if( State.turnZero ) {
 			State.turnZero = false;
 			return "0";
 		}	
-		if( redRemaining == 0 ) 
+		if( numBlocked == numMunchers ) 
 			return greedyTurn( );
 		int numToBlock = (numMunchers-redRemaining) - numBlocked;
 		System.out.println( "red remaining: " + redRemaining + "\tnum to block: " + numToBlock );		
-		if( numToBlock == 0 )
+		if( numToBlock <= 0 )
 			return "0";	
 		LinkedList<Muncher> mList = new LinkedList<Muncher>( );		
 		for( Node redNode : redMunchers ) {
 			Muncher m = blockRedMuncher( this, redNode );
-			if( m == null || numMunchableNodes(this, m.loc, m.program) <= 2 )
+			if( m == null || m.value <= 2 )
 				continue;
-			m.value = numMunchableNodes(this, m.loc, m.program);
 			mList.add(m);
 		}
+		System.out.println( "list size: " + mList.size( ) );		 
 		if( mList.size( ) == 0 )
 			return "0";
 		numBlocked += mList.size( );
@@ -207,18 +208,20 @@ public class State {
 		Arrays.sort(mArray, Collections.reverseOrder( ));
 		mArray = Arrays.copyOf(mArray,Math.min(mArray.length, numToBlock));
 		String out = mArray.length + ":";
-		for( Muncher m : mArray )
+		for( Muncher m : mArray ) {
 			out += m.loc.id + "/" + m.program + ",";
+			System.out.println( "muncher score: " + m.value );
+		}
 		out = out.substring(0,out.length( )-1);
 		return out;		
 	}
-	*/
 	static public Muncher blockRedMuncher( State state, Node redNode ) {
 		int max = 0;
 		Muncher bestMuncher = null;
 		for( Node node : redNode.activeSiblings( ) ) {
 			Muncher m = bestMuncherAtNode(state, node);
-			int score = numMunchableNodes(state, node, m.program);
+			int score = m.value;
+			System.out.println( "score: " + score );
 			if( score > max ) {
 				max = score;
 				bestMuncher = m;
@@ -236,9 +239,11 @@ public class State {
 				bestProgram = program;
 			}	
 		}
-		//if( bestProgram == null )
-		//	return new Muncher( node, "udlr", 0 );
-		return new Muncher( node, bestProgram, 0 );
+		if( bestProgram == null )
+			return new Muncher( node, "udlr", 0 );
+		Muncher out = new Muncher( node, bestProgram, 0 );
+		out.value = max;
+		return out;
 	}
 	static int numMunchableNodes( State state, Node node, String program ) {
 		LinkedList<Integer> visited = new LinkedList<Integer>( );
@@ -265,27 +270,130 @@ public class State {
 		}
 		return num+1;
 	}
-	/*
-	static int numMunchableNodes( State state, int loc, String program ) {
-		State copy = new State(state);
-		Muncher reds[ ] = new Muncher[state.redMunchers.length];
-		for( int i = 0; i < reds.length; i++ ) {
-			reds[i] = bestMuncherAtNodeSimple(copy.redMunchers[i]);
+	static Muncher bestMuncherAtNode2( State state, Node node ) {
+		LinkedList<Muncher> redList = new LinkedList<Muncher>( );
+		for( Node redNode : state.redMunchers ) {
+			Muncher r = bestMuncherAtNode( state, redNode );
+			if( r != null )
+				redList.add(r);
 		}
-		Node node = copy.nodes[loc];
-		Muncher m = new Muncher(node, program, 0);
-		return numMunchableNodes( state, m, reds );
+		int max = 0;
+		String bestProgram = null;
+		for( String program : Muncher.allPrograms ) {
+			int score = numMunchableNodes2( state, node, program, redList );
+			if( score >= max ) {
+				max = score;
+				bestProgram = program;
+			}
+		}
+		if( bestProgram == null )
+			return null;
+		Muncher out = new Muncher( node, bestProgram, 0 );
+		out.value = max; 
+		return out;
 	}
-	static int numMunchableNodes( State state, Muncher muncher, Muncher reds[ ] ) {
-	
+	static int numMunchableNodes2( State state, Node node, 
+								   String program, LinkedList<Muncher> mList ) {
+		for( Node n : state.nodes )
+			n.visitedBy = 0;
+		System.out.println(program);
+		System.out.print( "start: " );
+		node.view( );
+		Muncher blue = new Muncher( node, program, 0 );
+		mList.add(blue);
 		int num = 0;
-		while( !muncher.starved ) {
-			for( Muncher m : reds ) 
-				m.run( );
-			muncher.run( );			
-			muncher.loc.view( );
+		LinkedList<Node> visited = new LinkedList<Node>( );
+		while( !blue.starved ) {
 			num++;
-		}		
+			for( Muncher m : mList ) {
+					visited.add(m.loc);
+					if( m == blue )
+						m.loc.visitedBy = 1;
+					else
+						m.loc.visitedBy = 2;
+				if( !m.starved ) {
+					m.run( visited );
+				}
+			}
+			for( Muncher a : mList ) {
+				for( Muncher b : mList ) {
+					if( a == b )
+						continue;
+					if( a.loc == b.loc ) {
+						if( a.lastMove == 'u' )
+							b.starved = true;
+						else if( b.lastMove == 'u' )
+							a.starved = true;							
+						else if( a.lastMove == 'l' )
+							b.starved = true;														
+						else if( b.lastMove == 'l' )
+							a.starved = true;							
+						else if( a.lastMove == 'd' )
+							b.starved = true;														
+						else if( b.lastMove == 'd' )
+							a.starved = true;																																									
+						else if( a.lastMove == 'r' )
+							b.starved = true;														
+						else
+							a.starved = true;							
+					}
+				}
+			}	
+		}
+		System.out.print( num + "\n\n" );
+		return num;
+	}
+	/*
+	static int numMunchableNodes2( State state, Node node, 
+								   String program, LinkedList<Muncher> mList ) {
+		System.out.println(program);
+		System.out.print( "start: " );
+		node.view( );
+		State copy = new State(state);
+		//int count = 0;
+		//for( Node n : copy.nodes ) 
+		//	if( n.munched )
+		//		count++;
+		//System.out.println(count);
+		Muncher blue = new Muncher( copy.nodes[node.id], program, 0 );
+		for( Muncher m : mList )
+			m.loc = copy.nodes[m.loc.id];
+		mList.add(blue);
+		int num = 0;
+		while( !blue.starved ) {
+			num++;
+			for( Muncher m : mList ) {
+					m.loc.munched = true;		
+				if( !m.starved ) {
+					m.run(false);
+				}
+			}
+			for( Muncher a : mList ) {
+				for( Muncher b : mList ) {
+					if( a == b )
+						continue;
+					if( a.loc == b.loc ) {
+						if( a.lastMove == 'u' )
+							b.starved = true;
+						else if( b.lastMove == 'u' )
+							a.starved = true;							
+						else if( a.lastMove == 'l' )
+							b.starved = true;														
+						else if( b.lastMove == 'l' )
+							a.starved = true;							
+						else if( a.lastMove == 'd' )
+							b.starved = true;														
+						else if( b.lastMove == 'd' )
+							a.starved = true;																																									
+						else if( a.lastMove == 'r' )
+							b.starved = true;														
+						else
+							a.starved = true;							
+					}
+				}
+			}	
+		}
+		System.out.print( num + "\n\n" );
 		return num;
 	}
 	*/
