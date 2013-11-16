@@ -20,15 +20,15 @@ public class Player{
     return this.ownedItems;
   }
 
-  //public void winItem(Item item, int price){
-  //  this.ownedItems.add(item);
-  //  this.budget = this.budget - price;
-  //}
-
-  public void winItem(Item item, int remainBudget){
+  public void winItem(Item item, int price){
     this.ownedItems.add(item);
-    this.budget = remainBudget;
+    this.budget = this.budget - price;
   }
+
+  //public void winItem(Item item, int remainBudget){
+  //  this.ownedItems.add(item);
+  //  this.budget = remainBudget;
+  //}
 
 }
 
