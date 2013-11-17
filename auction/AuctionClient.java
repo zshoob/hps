@@ -5,6 +5,9 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 public class AuctionClient{
   static Socket sock = null;
@@ -13,6 +16,7 @@ public class AuctionClient{
   static int port = 4567;
   static String host = "127.0.0.1";
   static String teamName = "OffByOne";
+  static String eom = "<EOM>";
   static int playerNo = 0;
   static int itemType = 0;
   static Player[] players;
@@ -21,13 +25,17 @@ public class AuctionClient{
   static int playerId;
 
   public static String readSocket(BufferedReader in) throws IOException{
-    String data = null;
-    if((data = in.readLine()) != null){
-      System.out.println("Got data:" + data);
-      return data;
-    }else{
-      return null;
+    StringBuilder sb = new StringBuilder();
+    char[] cbuf = new char[2048];
+    while((in.read(cbuf, 0, 2048))!= -1){
+      sb.append(cbuf);
+      // System.out.println("Got message" + sb.toString());
+      if(sb.toString().contains(eom)){
+        System.out.println("break");
+        break;
+      }
     }
+    return sb.toString().replaceAll(eom, "");
   }
 
   public static void sendSocket(PrintWriter out, String text){
@@ -50,6 +58,7 @@ public class AuctionClient{
     for(int i = 0; i < itemNo; i++){
       items[i] = new Item(Integer.parseInt(splitedStr[i + 4]));
     }
+    System.out.println("Item List " + Arrays.toString(items));
   }
 
   private static void parseUpdateInfo(String str, int itemId){
@@ -59,6 +68,12 @@ public class AuctionClient{
     int budget = Integer.parseInt(splitedStr[2]);
     System.out.println("budget: " + budget);
     players[winnerId].winItem(items[itemId], winnerBid);
+    List<Item> lists = players[winnerId].getOwnedItems();
+    System.out.print("Player: " + winnerId + " list: ");
+    for(Item item:lists){
+      System.out.print(item.getType() + " ");
+    }
+    System.out.println();
   }
 
   public static void main(String[] args){
@@ -71,24 +86,30 @@ public class AuctionClient{
       sock = new Socket(host,port);
       out = new PrintWriter(sock.getOutputStream(), true);
       in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-
-      String handshake = in.readLine();
-      if(handshake.contains("Team")){
+      
+      String handshake = readSocket(in);
+      if(handshake.contains("Name")){
         sendSocket(out, teamName);
       }
-
-      String setupInfo = in.readLine().trim();
-      System.out.println("set up info" + setupInfo);
+      String setupInfo = readSocket(in).trim();
       parseInitialInfo(setupInfo);
       
-      // send first bid
-      String output = "0";
-      sendSocket(out, output);
+      // send first random bid
+      Random random = new Random();
+      int ranValue = random.nextInt(10);
+      sendSocket(out, String.valueOf(ranValue));
+
       int itemId = 0;
       while(true){
-        String updateInfo = in.readLine().trim();
+        String updateInfo = readSocket(in).trim();
+        if(updateInfo.equals("")){
+          System.out.println("Game ends!");   
+          break;
+        }
         parseUpdateInfo(updateInfo, itemId);
-        sendSocket(out, output);
+        // send random bin
+        ranValue = random.nextInt(10);
+        sendSocket(out, String.valueOf(ranValue));
         itemId++;
       }
       
