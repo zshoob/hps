@@ -68,6 +68,7 @@ def draw_partition(M,k):
 
 	fig = plt.figure()			
 	l = [1 * i for i in range(k)]
-	#plt.contourf(range(width),range(width),M,levels=range(k-1))
-	plt.imshow(M,interpolation='nearest')
-	plt.show()	
+	#plt.contourf(range(width),range(width),M)
+	plt.imshow(M,interpolation='nearest',cmap=cm.prism)
+	plt.show()
+	
