@@ -110,8 +110,13 @@ def vis(M1,M2,M3):
 	h = 800
 	for row in range(h):
 		for col in range(w):
-			M1[row][col] += M2[row][col]
-			M1[row][col] += M3[row][col]
+			for r in range(row-3,row+3):
+				for c in range(col-3,col+3):
+					try:
+						M1[r][c] = M2[r][c]
+						M1[r][c] = M3[r][c]
+					except:
+						pass
 	fig = plt.figure()			
 	plt.gca(frame_on=False, xticks=[], yticks=[],aspect='equal')				
 	#plt.contourf(range(width),range(width),R,cmap=cm.RdBu,aspect='equal')

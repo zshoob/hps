@@ -28,3 +28,18 @@ def generate_map( ):
 	for color in range(8):
 		M = generate_map_inner(M,popsize,color%2)
 	return M			
+	
+def write_map(M):
+	out = open('input_map.txt','w')
+	width = len(M)
+	for row in range(width-1):
+		for col in range(width-1):
+			out.write(str(M[row][col][0]) + ',' + str(M[row][col][1]) + ' ')
+		out.write(str(M[row][-1][0]) + ',' + str(M[row][-1][1]) + '\n')
+	for col in range(width-1):
+		out.write(str(M[-1][col][0]) + ',' + str(M[-1][col][1]) + ' ')
+	out.write(str(M[-1][-1][0]) + ',' + str(M[-1][-1][1]) + '\n')
+	out.close( )
+	
+M = generate_map( )
+write_map(M)	
