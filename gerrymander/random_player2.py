@@ -17,13 +17,53 @@ def point_seq(width):
 
 M = gm.generate_map( )
 width = len(M)
-k = 117
+area = width*width
+k = 4
 
 population = 0
 for row in M:
 	for col in row:
 		population += sum(col)
+
+D = [[-1 for row in range(width)] for col in range(width)]
+count = [0 for d in range(k)]
+
+seq = point_seq(width)
+parts = []
+while len(parts) < k-1:
+	p = random.randint(1,area-2)
+	if not p in parts:
+		parts.append(p)
+parts.sort( )
+pcopy = [p for p in parts]
 		
+print pcopy
+		
+d = 0
+last_part = True
+for i in range(area):
+	x,y = seq[i]
+	D[x][y] = d
+	count[d] += sum(M[x][y])
+	if len(pcopy) > 0 and i >= pcopy[0]:
+		pcopy.pop(0)
+		d += 1
+	'''
+	elif len(pcopy) == 0 and last_part:
+		last_part = False
+		d += 1
+	'''
+	
+for loop in range(1000):
+	part = parts[random.randint(0,len(parts)-1)]
+	x1,y1 = seq[part]
+	d1 = D[x1][y1]
+	
+	
+vs.draw_partitions(D)	
+
+
+'''		
 dsize = int(math.floor(float(population)/float(k)))
 D = [[-1 for row in range(width)] for col in range(width)]
 count = [0 for d in range(k)]
@@ -34,6 +74,10 @@ for row,col in point_seq(width):
 	count[d] += sum(M[row][col])
 	if count[d] > dsize and d < k-1:
 		d += 1	
+'''	
+	
+'''	
+print count
 	
 vs.draw_partitions(D)
 
@@ -57,5 +101,4 @@ for col in range(width):
 		R[col][row] = result[d]
 		
 vs.draw_results(M,R)
-
-vs.draw_population(M)
+'''

@@ -77,7 +77,7 @@ def draw_partitions(M):
 	'''
 	fig = plt.figure()			
 	plt.gca(frame_on=False, xticks=[], yticks=[],aspect='equal')	
-	plt.imshow(M,interpolation='nearest',cmap=cm.prism)
+	plt.imshow(M,interpolation='nearest',cmap=cm.RdBu)
 	#plt.show( )
 	plt.savefig('partition_map.png')
 
@@ -92,6 +92,7 @@ def draw_results(P,R):
 			the color which won each district, weighted by population size
 	'''
 	width = len(P)
+	M = [[0 for row in range(width)] for col in range(width)]
 	for col in range(width):
 		for row in range(width):
 			if P[col][row][0] > P[row][col][1]:
@@ -100,5 +101,6 @@ def draw_results(P,R):
 				M[col][row] = 1+sum(P[col][row])
 	fig = plt.figure()			
 	plt.gca(frame_on=False, xticks=[], yticks=[],aspect='equal')				
-	plt.contourf(range(width),range(width),M,cmap=cm.RdBu,aspect='equal')
+	#plt.contourf(range(width),range(width),R,cmap=cm.RdBu,aspect='equal')
+	plt.imshow(R,interpolation='nearest',cmap=cm.RdBu)	
 	plt.savefig('results_map.png')	

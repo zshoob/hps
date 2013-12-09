@@ -22,7 +22,7 @@ def generate_map_inner(M,popsize,color):
 	return M
 
 def generate_map( ):
-	width = 512
+	width = 128	
 	M = [[[0,0] for y in range(width)] for x in range(width)]
 	popsize = int(math.pow(2,13))	
 	for color in range(8):
