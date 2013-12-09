@@ -18,7 +18,7 @@ def point_seq(width):
 M = gm.generate_map( )
 width = len(M)
 area = width*width
-k = 4
+k = 17
 
 population = 0
 for row in M:
@@ -54,14 +54,26 @@ for i in range(area):
 		d += 1
 	'''
 	
-for loop in range(1000):
-	part = parts[random.randint(0,len(parts)-1)]
+for loop in range(1000000):
+	idx = random.randint(0,len(parts)-1)
+	part = parts[idx]
 	x1,y1 = seq[part]
 	d1 = D[x1][y1]
-	
-	
-vs.draw_partitions(D)	
+	x2,y2 = seq[part+1]
+	d2 = D[x2][y2]	
+	if count[d1] < count[d2]:
+		parts[idx] += 1
+		count[d1] += sum(M[x2][y2])
+		count[d2] -= sum(M[x2][y2])
+		D[x2][y2] = d1
+	elif count[d1] > count[d2]:
+		parts[idx] -= 1
+		count[d1] -= sum(M[x1][y1])
+		count[d2] += sum(M[x1][y1])			
+		D[x1][y1] = d2		
 
+print count
+vs.draw_partitions(D)	
 
 '''		
 dsize = int(math.floor(float(population)/float(k)))
