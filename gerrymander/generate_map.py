@@ -10,8 +10,6 @@ def generate_map_inner(M,popsize,color):
 		y = rndm.randint(0,width-1)
 		points.append([x,y])
 	for loop in range(0,popsize):
-		#if loop % ((popsize-(2*n))/5) == 0:
-		#	draw(M,n)
 		l = len(points)
 		a = rndm.randint(0,l-1)
 		b = rndm.randint(0,l-1)

@@ -40,7 +40,14 @@ def compress(M,factor):
 					N[col][row][1] += M[col*factor + x][row*factor + y][1]
 	return N
 
-def draw(M):
+def draw_population(M):
+	'''
+	input: M - a population map (given by generate_map.generate_map( ))
+	
+	output: writes file 'population_map.png' to the local directory, which
+			shows the color of the dominant part in each area, weighted
+			by population density			
+	'''
 	M = compress(M,8)
 	width = len(M[0])
 	P = [[0 for y in range(width)] for x in range(width)]
@@ -56,19 +63,42 @@ def draw(M):
 	#ax = fig.add_subplot(frame_on=False, xticks=[], yticks=[],aspect='equal')
 	plt.contourf(range(width),range(width),P,cmap=cm.RdBu,aspect='equal')
 	#plt.show( )
-	plt.savefig('init_state.png')
+	plt.savefig('population_map.png')
 	
-def draw_partition(M,k):
-	parts = {}
-	width = len(M)
+def draw_partitions(M):
+	'''
+	input: M a partitioning of the population map, where 
+			M[col][row] = n if the point (col,row) lies in 
+			district n
+			
+	output: writes file 'partition_map.png' to the local 
+			directory, in which each district is shown
+			with a different color
+	'''
+	fig = plt.figure()			
+	plt.gca(frame_on=False, xticks=[], yticks=[],aspect='equal')	
+	plt.imshow(M,interpolation='nearest',cmap=cm.prism)
+	#plt.show( )
+	plt.savefig('partition_map.png')
 
+	
+def draw_results(P,R):
+	'''
+	input: P - a population map (given by generate_map.generate_map( ))
+		   R - a map of the election results, where 
+		   			R[x][y] = 0 if the point (x,y) is in a district which 
+		   			voted 'blue' and R[x][y] = 1 otherwise
+	output: writes file 'results_map.png' to the local directory, which shows
+			the color which won each district, weighted by population size
+	'''
+	width = len(P)
 	for col in range(width):
 		for row in range(width):
-			M[col][row] *= 1
-
+			if P[col][row][0] > P[row][col][1]:
+				M[col][row] = -1 * (1+sum(P[col][row]))
+			else:
+				M[col][row] = 1+sum(P[col][row])
 	fig = plt.figure()			
-	l = [1 * i for i in range(k)]
-	#plt.contourf(range(width),range(width),M)
-	plt.imshow(M,interpolation='nearest',cmap=cm.prism)
-	plt.show()
-	
+	plt.gca(frame_on=False, xticks=[], yticks=[],aspect='equal')				
+	plt.contourf(range(width),range(width),M,cmap=cm.RdBu,aspect='equal')
+	plt.savefig('results_map.png')	
