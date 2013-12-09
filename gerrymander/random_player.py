@@ -13,11 +13,6 @@ def point_seq(width):
 		seq.extend([[width-layer-1,col] for col in range(width-layer-2,layer-1,-1)])
 		seq.extend([[row,layer] for row in range(width-layer-2,layer,-1)])
 	return seq
-		
-
-M = gm.generate_map( )
-width = len(M)
-k = 17
 
 def read_input( ):
 	lines = []

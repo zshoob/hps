@@ -79,7 +79,7 @@ def draw_partitions(M):
 	plt.gca(frame_on=False, xticks=[], yticks=[],aspect='equal')	
 	plt.imshow(M,interpolation='nearest',cmap=cm.Set1)
 	plt.savefig('partition_map.png')
-	#plt.show( )	
+	plt.show( )	
 
 	
 def draw_results(P,R):
