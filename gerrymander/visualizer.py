@@ -102,5 +102,19 @@ def draw_results(P,R):
 	fig = plt.figure()			
 	plt.gca(frame_on=False, xticks=[], yticks=[],aspect='equal')				
 	#plt.contourf(range(width),range(width),R,cmap=cm.RdBu,aspect='equal')
-	plt.imshow(R,interpolation='nearest',cmap=cm.RdBu)	
+	plt.imshow(R,interpolation='nearest',cmap=cm.Blues)	
 	plt.savefig('results_map.png')	
+	
+def vis(M1,M2,M3):
+	w = 600
+	h = 800
+	for row in range(h):
+		for col in range(w):
+			M1[row][col] += M2[row][col]
+			M1[row][col] += M3[row][col]
+	fig = plt.figure()			
+	plt.gca(frame_on=False, xticks=[], yticks=[],aspect='equal')				
+	#plt.contourf(range(width),range(width),R,cmap=cm.RdBu,aspect='equal')
+	plt.imshow(M1,interpolation='nearest',cmap=cm.Blues)	
+	plt.show()			
+	

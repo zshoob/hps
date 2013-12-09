@@ -17,7 +17,7 @@ def point_seq(width):
 
 M = gm.generate_map( )
 width = len(M)
-k = 117
+k = 17
 
 population = 0
 for row in M:
@@ -58,4 +58,4 @@ for col in range(width):
 		
 vs.draw_results(M,R)
 
-vs.draw_population(M)
+#vs.draw_population(M)
