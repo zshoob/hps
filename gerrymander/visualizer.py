@@ -79,7 +79,7 @@ def draw_partitions(M):
 	plt.gca(frame_on=False, xticks=[], yticks=[],aspect='equal')	
 	plt.imshow(M,interpolation='nearest',cmap=cm.Set1)
 	plt.savefig('partition_map.png')
-	plt.show( )	
+	#plt.show( )	
 
 	
 def draw_results(P,R):
@@ -121,5 +121,5 @@ def vis(M1,M2,M3):
 	plt.gca(frame_on=False, xticks=[], yticks=[],aspect='equal')				
 	#plt.contourf(range(width),range(width),R,cmap=cm.RdBu,aspect='equal')
 	plt.imshow(M1,interpolation='nearest',cmap=cm.Blues)	
-	plt.show()			
+	#plt.show()			
 	

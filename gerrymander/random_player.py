@@ -57,12 +57,8 @@ def generate_solution(M,k):
 			
 	return D			
 		
-k = 5		
-M = read_input( )
-D = generate_solution(M,k)
-		
 #vs.draw_results(M,D)
-vs.draw_partitions(D)
+#vs.draw_partitions(D)
 #vs.draw_population(M)
 
 '''

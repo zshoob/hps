@@ -41,5 +41,3 @@ def write_map(M):
 	out.write(str(M[-1][-1][0]) + ',' + str(M[-1][-1][1]) + '\n')
 	out.close( )
 	
-M = generate_map( )
-write_map(M)	
