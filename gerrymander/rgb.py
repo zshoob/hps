@@ -12,10 +12,10 @@ def pop_to_rgb(M):
 				N[row][col] = red
 	return N
 	
-def write_pop(M):
+def write_pop(M,fname):
 	N = pop_to_rgb(M)
 	nsize = len(N)
-	out = open('pop_hex.txt','w')
+	out = open(fname,'w')
 	for row in range(nsize):
 		for col in range(nsize):
 			out.write(N[row][col])

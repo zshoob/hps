@@ -4,10 +4,10 @@ import visualizer as vs
 import check_contiguous as cc
 import rgb
 
-k = 10
+k = 5
 M = gm.generate_map( )
-#gm.write_map(M)
+gm.write_map(M)
 #D = rp.generate_solution(M,k)
 #vs.draw_partitions(D)
 #vs.draw_population(M)
-rgb.write_pop(M)
+#rgb.write_pop(M)

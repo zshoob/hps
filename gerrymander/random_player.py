@@ -1,8 +1,7 @@
 import generate_map as gm
 import visualizer as vs
-import random
-import math
-import itertools
+import rgb
+import random, math, itertools, sys
 
 def point_seq(width):
 	w = width/2
@@ -14,9 +13,9 @@ def point_seq(width):
 		seq.extend([[row,layer] for row in range(width-layer-2,layer,-1)])
 	return seq
 
-def read_input( ):
+def read_input(file):
 	lines = []
-	with open('input_map.txt','r') as ipt:
+	with open(file,'r') as ipt:
 		lines = ipt.read( ).split('\n')[:-1]
 	M = []
 	for line in lines:
@@ -56,6 +55,16 @@ def generate_solution(M,k):
 			d += 1	
 			
 	return D			
+	
+def main(args):
+	file = args[0]
+	M = read_input(file)
+	k = int(args[1])
+	D = generate_solution(M,k)
+	rgb.write_pop(M,'random_player_solution.txt')
+	
+if __name__ == "__main__":
+	main(sys.argv[1:])	
 		
 #vs.draw_results(M,D)
 #vs.draw_partitions(D)
