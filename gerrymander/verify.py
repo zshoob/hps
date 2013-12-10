@@ -38,6 +38,24 @@ def is_vary_beyond_range(pop, percentage):
   per = float(max_value)/float(min_value)
   return (per - 1) > percentage
 
+def get_election_result(M, N, k):
+  width = len(N)
+  red = [0] * k
+  blue = [0] * k
+  for row in range(width-1):
+    for col in range(width-1):
+      dis = int(N[row][col])
+      red[dis] += M[row][col][0]
+      blue[dis] += M[row][col][1]
+
+  ret = [0]*k;
+  for i in range(0, k -1):
+    if(red[dis] < blue[dis]):
+      ret[i] = 0
+    else:
+      ret[i] = 1
+  return ret
+
 
 M = read_input_map()
 N = read_input_solution()
@@ -47,3 +65,7 @@ print len(pop)
 for p in pop:
   print p
 print is_vary_beyond_range(pop, 0.02)
+
+ret = get_election_result(M, N, 5)
+for r in ret:
+  print r
