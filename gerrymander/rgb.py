@@ -59,31 +59,49 @@ def write_pop(M,fname):
 	w.write(f, P)
 	f.close()
 	
-def districts_to_rgb(D):
-	colors = ['DD1E2F','EBB035','06A2CB','218559','D0C6B1']
+def partitions_to_rgb(M):
+	colors = [[221,30,47],[235,176,53],[6,162,203],[33,133,89],[208,198,177]]
 	districts = []
-	dsize = len(D)
-	for row in range(dsize):
-		for col in range(dsize):
-			district = D[row][col]
-			if not district in districts:
-				districts.append(district)
-	D2 = [['' for col in range(dsize)] for row in range(dsize)]
-	for row in range(dsize):
-		for col in range(dsize):	
-			color = colors[districts.index(D[row][col])]
-			D2[row][col] = color
-	return D2
-	
-def write_partition(D,fname):
-	M = districts_to_rgb(D)
 	msize = len(M)
-	out = open(fname,'w')
 	for row in range(msize):
 		for col in range(msize):
-			out.write(M[row][col])
-			if col < msize-1:
-				out.write(',')
-		if row < msize-1:
-			out.write('\n')
-	out.close( )	
+			district = M[row][col]
+			if not district in districts:
+				districts.append(district)
+	N = []
+	for row in range(msize):
+		r = []
+		for col in range(msize):	
+			color = colors[districts.index(M[row][col])]
+			r.extend(color)
+		N.append(r)
+	return N
+	
+def write_partitions(M,fname):
+	P = partitions_to_rgb(M)
+	f = open(fname, 'wb')
+	w = png.Writer(512,512)
+	w.write(f, P)
+	f.close()
+	
+def results_to_rgb(M):
+	red = [221,30,47]
+	blue = [6,162,203]
+	msize = len(M)
+	N = []
+	for row in range(msize):
+		r = []
+		for col in range(msize):	
+			if M[row][col] == 0:
+				r.extend(blue)
+			else:
+				r.extend(red)
+		N.append(r)
+	return N
+	
+def write_results(M,fname):
+	R = results_to_rgb(M)
+	f = open(fname, 'wb')
+	w = png.Writer(512,512)
+	w.write(f, R)
+	f.close()
