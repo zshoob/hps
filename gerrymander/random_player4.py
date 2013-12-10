@@ -35,7 +35,8 @@ def populated_areas(M):
 def evaluate(sol,M,plist):
 	k = len(sol)
 	count = [0 for d in range(k)]
-	for row,col in plist:
+	for sample in range(10000):
+		row,col = plist[random.randint(0,len(plist)-1)]
 		num_people = sum(M[row][col])
 		mindist = float("inf")
 		d = None
@@ -57,15 +58,21 @@ def cross(s1,s2):
 			s3[point] = copy.deepcopy(s2[point])
 	return s3
 	
-def mutate(sol):
-	alpha = 0.3
+def sigma_generator(init_sigma,alpha):
+	sigma = init_sigma
+	while True:
+		yield max(sigma,1.0)
+		sigma *= alpha
+	
+def mutate(sol,sigma_gen):
+	alpha = 0.35
 	mu = 0
-	sigma = 5
+	#sigma = 9
 	k = len(sol)
 	for point in range(k):
 		for dim in range(2):
 			if random.uniform(0,1) <= alpha:
-				sol[point][dim] += math.ceil(random.gauss(mu,sigma))
+				sol[point][dim] += math.ceil(random.gauss(mu,sigma_gen.next( )))
 	#return sol	
 	
 def show(sol,M):
@@ -87,24 +94,25 @@ def show(sol,M):
 			count[d] += num_people
 	print count
 	
-n = 10
-k = 5
+n = 5
+k = 8
 M = read_input( )
 mapsize = len(M)
 plist = populated_areas(M)	
 pop = seed_population(n,k,mapsize)
 minscore = float("inf")
-for generation in range(100):
+sigma_gen = sigma_generator(20,0.9995)
+for generation in range(200):
+	print '\t' +  str(sigma_gen.next( ))
 	pop = sorted(pop, key = lambda sol: evaluate(sol,M,plist))
 	score = evaluate(pop[0],M,plist)
 	print score
 	if score < minscore:
 		minscore = score
-		show(pop[0],M)
+		#show(pop[0],M)
 	offspring = cross(pop[0],pop[1])
 	pop[-1] = cross(pop[0],pop[1])
 	pop[-2] = cross(pop[0],pop[1])
-	pop[-3] = cross(pop[1],pop[2])
-	for s in range(2,n):
-		mutate(pop[s])
+	for s in range(1,n):
+		mutate(pop[s],sigma_gen)
 	

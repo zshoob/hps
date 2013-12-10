@@ -78,8 +78,8 @@ def draw_partitions(M):
 	fig = plt.figure()			
 	plt.gca(frame_on=False, xticks=[], yticks=[],aspect='equal')	
 	plt.imshow(M,interpolation='nearest',cmap=cm.Set1)
-	plt.savefig('partition_map.png')
-	#plt.show( )	
+	#plt.savefig('partition_map.png')
+	plt.show( )	
 
 	
 def draw_results(P,R):
@@ -102,7 +102,7 @@ def draw_results(P,R):
 	fig = plt.figure()			
 	plt.gca(frame_on=False, xticks=[], yticks=[],aspect='equal')				
 	#plt.contourf(range(width),range(width),R,cmap=cm.RdBu,aspect='equal')
-	plt.imshow(R,interpolation='nearest',cmap=cm.Blues)	
+	plt.imshow(R,interpolation='nearest',cmap=cm.RdBu)	
 	plt.savefig('results_map.png')	
 	
 def vis(M1,M2,M3):
@@ -123,3 +123,16 @@ def vis(M1,M2,M3):
 	plt.imshow(M1,interpolation='nearest',cmap=cm.Blues)	
 	#plt.show()			
 	
+def vis2(M):
+	M2 = [[0 for col in row] for row in M]
+	for row in range(len(M)):
+		for col in range(len(M)):
+			if M[row][col][0] > M[row][col][1]:
+				M2[row][col] = 100
+			elif M[row][col][0] < M[row][col][1]:
+				M2[row][col] = -100
+	fig = plt.figure()			
+	plt.gca(frame_on=False, xticks=[], yticks=[],aspect='equal')				
+	#plt.contourf(range(width),range(width),R,cmap=cm.RdBu,aspect='equal')
+	plt.imshow(M2,interpolation='nearest')
+	plt.show()			
