@@ -1,40 +1,36 @@
 import png
 
-'''
-def pop_to_rgb(M):
-	red = 'B0171F'
-	blue = '1874CD'
-	white = 'FFFFFF'
-	msize = len(M)	
-	N = [[white for col in range(msize)] for row in range(msize)]
+def distance(a,b):
+	return math.sqrt(math.pow(a[0]-b[0],2) + math.pow(a[1]-b[1],2))
+	
+def color(point,M):
+	x,y = point
+	red = 0
+	blue = 0
+
+	p_list = point_list(M)
+	for [col,row] in p_list:
+		d = distance([x,y],[col,row])
+		red += M[col][row][0] / (math.pow(d,2) + 0.00001)
+		blue += M[col][row][1] / (math.pow(d,2) + 0.00001)
+		
+	if red > blue:
+		return red
+	else:
+		return -1 * blue
+
+def add_gradients(M):
+	msize = len(M)
+	N = [[0.0 for col in range(msize)] for row in range(msize)]
 	for row in range(msize):
 		for col in range(msize):
-			if M[row][col][0] > M[row][col][1]:
-				N[row][col] = blue
-			elif M[row][col][0] < M[row][col][1]:
-				N[row][col] = red
+			N[row][col] = color([row,col],M)
 	return N
 	
-def write_pop(M,fname):
-	N = pop_to_rgb(M)
-	nsize = len(N)
-	out = open(fname,'w')
-	for row in range(nsize):
-		for col in range(nsize):
-			out.write(N[row][col])
-			if col < nsize-1:
-				out.write(',')
-		if row < nsize-1:
-			out.write('\n')
-	out.close( )
-'''
+#def pop_to_rgb2(M):
+		
 
 def pop_to_rgb(M):
-	'''
-	red = '221,30,47,'
-	blue = '6,162,203'
-	white = '208,198,177'	
-	'''
 	red = [221,30,47]
 	blue = [6,162,203]
 	white = [255,255,255]
@@ -85,7 +81,8 @@ def write_partitions(M,fname):
 	f.close()
 	
 def results_to_rgb(M):
-	red = [221,30,47]
+	#red = [221,30,47]
+	red = [3,91,101]
 	blue = [6,162,203]
 	msize = len(M)
 	N = []

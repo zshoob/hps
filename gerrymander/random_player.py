@@ -1,5 +1,6 @@
 import generate_map as gm
 import visualizer as vs
+import get_results as gr
 import rgb
 import random, math, itertools, sys
 
@@ -61,7 +62,9 @@ def main(args):
 	M = read_input(file)
 	k = int(args[1])
 	D = generate_solution(M,k)
-	rgb.write_pop(M,'random_player_solution.txt')
+	rgb.write_partitions(D,'random_player_solution.png')
+	R = gr.get_results(D,M,k)
+	rgb.write_results(R,'random_player_results.png')
 	
 if __name__ == "__main__":
 	main(sys.argv[1:])	
