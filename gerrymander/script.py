@@ -9,11 +9,13 @@ import png
 
 k = 5
 M = gm.generate_map( )
-#gm.write_map(M)
-rgb.write_pop(M,'pop.png')
+gm.write_map(M)
+#rgb.write_pop(M,'pop.png')
 P = rp.generate_solution(M,k)
+rp.write_solution(P)
 #rgb.write_partitions(P,'partitions.png')
-ev.evaluate('random_player',k)
+t = ev.evaluate('random_player',k)
+print t
 		
 '''
 rgb.write_partitions(P,'partitions.png')

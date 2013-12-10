@@ -1,40 +1,13 @@
 import png
 
-def distance(a,b):
-	return math.sqrt(math.pow(a[0]-b[0],2) + math.pow(a[1]-b[1],2))
-	
-def color(point,M):
-	x,y = point
-	red = 0
-	blue = 0
-
-	p_list = point_list(M)
-	for [col,row] in p_list:
-		d = distance([x,y],[col,row])
-		red += M[col][row][0] / (math.pow(d,2) + 0.00001)
-		blue += M[col][row][1] / (math.pow(d,2) + 0.00001)
-		
-	if red > blue:
-		return red
-	else:
-		return -1 * blue
-
-def add_gradients(M):
-	msize = len(M)
-	N = [[0.0 for col in range(msize)] for row in range(msize)]
-	for row in range(msize):
-		for col in range(msize):
-			c = color([row,col],M)
-			N[row][col] = color([row,col],M)
-	return N
-	
-#def pop_to_rgb2(M):
-		
-
 def pop_to_rgb(M):
+	'''
+		Maps population map @M to a 2d-list @N of rgb values, for writing to .png.
+		Thus, N[row][col] = red if M[row][col] has a majority of red voters, 
+		or blue if a majority of blue voters, or white otherwise.
+	'''
 	red = [221,30,47]
 	blue = [6,162,203]
-	#white = [255,255,255]
 	white = [245,245,220]
 	msize = len(M)	
 	N = [[white for col in range(msize)] for row in range(msize)]
@@ -50,22 +23,16 @@ def pop_to_rgb(M):
 						N[r][c] = red
 	for row in range(msize):
 		N[row] = [val for color in N[row] for val in color]				
-	'''
-	N = []
-	for row in range(msize):
-		r = []
-		for col in range(msize):
-			if M[row][col][0] > M[row][col][1]:
-				r.extend(blue)
-			elif M[row][col][0] < M[row][col][1]:
-				r.extend(red)
-			else:
-				r.extend(white)
-		N.append(r)
-	'''
 	return N
 	
 def write_pop(M,fname):
+	'''
+		@M: a population distribution map
+		@P: a mapping of rgb values from @M (see comments in function 
+			pop_to_rgb(M) above)
+		
+		Writes @P to a png file in the local directory with name @fname.
+	'''
 	P = pop_to_rgb(M)
 	f = open(fname, 'wb')
 	w = png.Writer(512,512)
@@ -73,6 +40,14 @@ def write_pop(M,fname):
 	f.close()
 	
 def partitions_to_rgb(M):
+	'''
+		@colors: a standard set of colors for each district
+		
+		Maps district partition map @M to a 2d-list @N of rgb values, 
+		for writing to png. Thus, N[row][col] = colors[d] if M[row][col]
+		lies in district d. 
+		
+	'''
 	colors = [[221,30,47],[235,176,53],[6,162,203],[33,133,89],[208,198,177]]
 	districts = []
 	msize = len(M)
@@ -91,6 +66,13 @@ def partitions_to_rgb(M):
 	return N
 	
 def write_partitions(M,fname):
+	'''
+		@M: a district partition map
+		@P: a mapping of rgb values from @M (see comments in function 
+			partitions_to_rgb(M) above)
+		
+		Writes @P to a png file in the local directory with name @fname.
+	'''	
 	P = partitions_to_rgb(M)
 	f = open(fname, 'wb')
 	w = png.Writer(512,512)
@@ -98,6 +80,12 @@ def write_partitions(M,fname):
 	f.close()
 	
 def results_to_rgb(M):
+	'''
+		Maps election results map @M to a 2d-list @N of rgb values, 
+		for writing to png. Thus, N[row][col] = 'blue' if (row,col) 
+		lies in a district which voted blue in M, and 'red' otherwise.
+	
+	'''
 	red = [221,30,47]
 	blue = [6,162,203]
 	msize = len(M)
@@ -113,6 +101,13 @@ def results_to_rgb(M):
 	return N
 	
 def write_results(M,fname):
+	'''
+		@M: an election results map
+		@R: a mapping of rgb values from @M (see comments in function 
+			results_to_rgb(M) above)
+		
+		Writes @R to a png file in the local directory with name @fname.
+	'''
 	R = results_to_rgb(M)
 	f = open(fname, 'wb')
 	w = png.Writer(512,512)
