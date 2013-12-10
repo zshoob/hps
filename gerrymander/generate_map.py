@@ -65,7 +65,7 @@ def generate_map( ):
 	return M			
 	
 def write_map(M):
-	out = open('input_map.txt','w')
+	out = open('population_map.txt','w')
 	width = len(M)
 	for row in range(width-1):
 		for col in range(width-1):
@@ -75,5 +75,11 @@ def write_map(M):
 		out.write(str(M[-1][col][0]) + ',' + str(M[-1][col][1]) + ' ')
 	out.write(str(M[-1][-1][0]) + ',' + str(M[-1][-1][1]) + '\n')
 	out.close( )
+	
+def main( ):
+	write_map(generate_map( ))
+	
+if __name__ == "__main__":
+	main( )	
 	
 #M = vs.compress(M,12)

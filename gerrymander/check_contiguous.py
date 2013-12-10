@@ -32,4 +32,3 @@ def check_contiguous(D,k):
 			if D[row][col] > -1:
 				return False
 	return True
-	
