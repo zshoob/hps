@@ -12,6 +12,19 @@ def read_input(fname):
 		row = [[int(col.split(',')[0]),int(col.split(',')[1])] for col in line.split(' ')]
 		M.append(row)
 	return M
+	
+def write_solution(P):
+	mapsize = len(P)
+	out = open('random_player_solution.txt','w')
+	for row in range(mapsize):
+		for col in range(mapsize):
+			out.write(str(P[row][col]))
+			if col < mapsize-1:
+				out.write(' ')
+			else:
+				out.write('\n')
+		out.write('\n')
+	out.close( )	
 
 def seed_population(n,k,mapsize):
 	pop = [[[0,0] for point in range(k)] for sol in range(n)]
@@ -105,7 +118,7 @@ def generate_solution(M,k):
 	minscore = float("inf")
 	sigma_gen = sigma_generator(9,0.9999)
 	score = evaluate(pop[0],M,pcells)
-	while score >= 2.1:
+	while score >= 2.0:
 		#print '\t' +  str(sigma_gen.next( ))
 		pop = sorted(pop, key = lambda sol: evaluate(sol,M,pcells))
 		score = evaluate(pop[0],M,pcells)
@@ -136,13 +149,10 @@ def generate_solution(M,k):
 	return P
 	
 def main(args):
-	file = args[0]
-	M = read_input(file)
-	k = int(args[1])
-	D = generate_solution(M,k)
-	rgb.write_partitions(D,'random_player_solution.png')
-	R = gr.get_results(D,M,k)
-	rgb.write_results(R,'random_player_results.png')
+	M = read_input('population_map.txt')
+	k = int(args[0])
+	P = generate_solution(M,k)
+	write_solution(P)
 	
 if __name__ == "__main__":
 	main(sys.argv[1:])	

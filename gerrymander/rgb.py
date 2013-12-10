@@ -34,8 +34,23 @@ def add_gradients(M):
 def pop_to_rgb(M):
 	red = [221,30,47]
 	blue = [6,162,203]
-	white = [255,255,255]
+	#white = [255,255,255]
+	white = [245,245,220]
 	msize = len(M)	
+	N = [[white for col in range(msize)] for row in range(msize)]
+	for row in range(msize):
+		for col in range(msize):	
+			if M[row][col][0] > M[row][col][1]:
+				for r in range(max(0,row-1),min(msize-1,row+2)):
+					for c in range(max(0,col-1),min(msize-1,col+2)):				
+						N[r][c] = blue
+			elif M[row][col][0] < M[row][col][1]:
+				for r in range(max(0,row-1),min(msize-1,row+2)):
+					for c in range(max(0,col-1),min(msize-1,col+2)):				
+						N[r][c] = red
+	for row in range(msize):
+		N[row] = [val for color in N[row] for val in color]				
+	'''
 	N = []
 	for row in range(msize):
 		r = []
@@ -47,6 +62,7 @@ def pop_to_rgb(M):
 			else:
 				r.extend(white)
 		N.append(r)
+	'''
 	return N
 	
 def write_pop(M,fname):
