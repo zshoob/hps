@@ -1,22 +1,11 @@
-import generate_map as gm
+import math, random, copy, sys
 import visualizer as vs
 import get_results as gr
 import rgb
-import random, math, itertools, sys
 
-def point_seq(width):
-	w = width/2
-	seq = []
-	for layer in range(w):
-		seq.extend([[layer,col] for col in range(layer,width-layer)])	
-		seq.extend([[row,width-layer-1] for row in range(layer+1,width-layer)])
-		seq.extend([[width-layer-1,col] for col in range(width-layer-2,layer-1,-1)])
-		seq.extend([[row,layer] for row in range(width-layer-2,layer,-1)])
-	return seq
-
-def read_input(file):
+def read_input(fname):
 	lines = []
-	with open(file,'r') as ipt:
+	with open(fname,'r') as ipt:
 		lines = ipt.read( ).split('\n')[:-1]
 	M = []
 	for line in lines:
@@ -24,38 +13,127 @@ def read_input(file):
 		M.append(row)
 	return M
 
-def write_solution(D):
-	out = open('solution.txt','w')
-	width = len(D)
-	for row in range(width-1):
-		for col in range(width-1):
-			out.write(str(D[row][col]) + ' ')
-		out.write(str(D[row][-1]) + '\n')
-	for col in range(width-1):
-		out.write(str(D[-1][col]) + ' ')
-	out.write(str(D[-1][-1]) + '\n')
-	out.close( )	
-
-def generate_solution(M,k):
-	width = len(M)
+def seed_population(n,k,mapsize):
+	pop = [[[0,0] for point in range(k)] for sol in range(n)]
+	i = int(.4 * mapsize)
+	j = mapsize - i
+	for sol in range(n):
+		for point in range(k):
+			pop[sol][point] = [random.randint(i,j),random.randint(i,j)]
+	return pop
 	
-	population = 0
-	for row in M:
-		for col in row:
-			population += sum(col)
-		
-	dsize = int(math.floor(float(population)/float(k)))
-	D = [[-1 for row in range(width)] for col in range(width)]
+def distance(a,b):
+	return math.sqrt(math.pow(a[0]-b[0],2) + math.pow(a[1]-b[1],2))	
+	
+def populated_areas(M):
+	pcells = []
+	mapsize = len(M)
+	for row in range(mapsize):
+		for col in range(mapsize):
+			if sum(M[row][col]) > 0:
+				pcells.append([row,col])
+	return pcells	
+	
+def evaluate(sol,M,pcells):
+	k = len(sol)
 	count = [0 for d in range(k)]
+	#for sample in range(10000):
+		#row,col = pcells[random.randint(0,len(pcells)-1)]
+	for row,col in pcells:
+		num_people = sum(M[row][col])
+		mindist = float("inf")
+		d = None
+		for point in range(k):
+			dist = distance(sol[point],[row,col])
+			if dist < mindist:
+				mindist = dist
+				d = point
+		count[d] += num_people
+	return float(max(count)) / float(min(count) + 0.0001)
+	
+def cross(s1,s2):
+	k = len(s1)
+	s3 = [[0,0] for point in range(k)]
+	for point in range(k):
+		if random.randint(0,2):
+			s3[point] = copy.deepcopy(s1[point])
+		else:
+			s3[point] = copy.deepcopy(s2[point])
+	return s3
+	
+def sigma_generator(init_sigma,alpha):
+	sigma = init_sigma
+	while True:
+		yield max(sigma,1.0)
+		sigma *= alpha
+	
+def mutate(sol,sigma_gen):
+	alpha = 0.5
+	mu = 0
+	#sigma = 9
+	k = len(sol)
+	for point in range(k):
+		for dim in range(2):
+			if random.uniform(0,1) <= alpha:
+				sol[point][dim] += math.ceil(random.gauss(mu,sigma_gen.next( )))
+	#return sol	
+	
+def show(sol,M):
+	mapsize = len(M)
+	k = len(sol)
+	count = [0 for d in range(k)]
+	D = [[0 for col in range(mapsize)] for row in range(mapsize)]
+	for row in range(mapsize):
+		for col in range(mapsize):
+			num_people = sum(M[row][col])
+			mindist = float("inf")
+			d = None
+			for point in range(k):
+				dist = distance(sol[point],[row,col])
+				if dist < mindist:
+					mindist = dist
+					d = point			
+			D[row][col] = d
+			count[d] += num_people
+	vs.draw_partitions(D)
+	
+def generate_solution(M,k):		
+	n = 5
+	mapsize = len(M)
+	pcells = populated_areas(M)	
+	pop = seed_population(n,k,mapsize)
+	minscore = float("inf")
+	sigma_gen = sigma_generator(9,0.9999)
+	score = evaluate(pop[0],M,pcells)
+	while score >= 2.1:
+		#print '\t' +  str(sigma_gen.next( ))
+		pop = sorted(pop, key = lambda sol: evaluate(sol,M,pcells))
+		score = evaluate(pop[0],M,pcells)
+		#print score
+		#for p in pop:
+		#	print p
+		if score < minscore:
+			minscore = score
+		pop[-1] = cross(pop[0],pop[1])
+		for s in range(1,n):
+			mutate(pop[s],sigma_gen)
+	
+	sol = pop[0]
+	
+	P = [[0 for col in range(mapsize)] for row in range(mapsize)]
+	for row in range(mapsize):
+		for col in range(mapsize):
+			num_people = sum(M[row][col])
+			mindist = float("inf")
+			d = None
+			for point in range(k):
+				dist = distance(sol[point],[row,col])
+				if dist < mindist:
+					mindist = dist
+					d = point			
+			P[row][col] = d
 
-	d = 0
-	for row,col in point_seq(width):
-		D[row][col] = d
-		count[d] += sum(M[row][col])
-		if count[d] > dsize and d < k-1:
-			d += 1	
-			
-	return D			
+	return P
 	
 def main(args):
 	file = args[0]
@@ -68,28 +146,3 @@ def main(args):
 	
 if __name__ == "__main__":
 	main(sys.argv[1:])	
-		
-#vs.draw_results(M,D)
-#vs.draw_partitions(D)
-#vs.draw_population(M)
-
-'''
-result = [[0,0] for d in range(k)]
-for col in range(width):
-	for row in range(width):
-		d = D[col][row]
-		result[d][0] += M[col][row][0]
-		result[d][1] += M[col][row][1]
-	
-for d in range(k):
-	if result[d][0] > result[d][1]:
-		result[d] = 0
-	else:
-		result[d] = 1
-	
-R = [[-1 for row in range(width)] for col in range(width)]
-for col in range(width):
-	for row in range(width):
-		d = D[col][row]
-		R[col][row] = result[d]
-'''

@@ -24,6 +24,7 @@ def add_gradients(M):
 	N = [[0.0 for col in range(msize)] for row in range(msize)]
 	for row in range(msize):
 		for col in range(msize):
+			c = color([row,col],M)
 			N[row][col] = color([row,col],M)
 	return N
 	
@@ -81,8 +82,7 @@ def write_partitions(M,fname):
 	f.close()
 	
 def results_to_rgb(M):
-	#red = [221,30,47]
-	red = [3,91,101]
+	red = [221,30,47]
 	blue = [6,162,203]
 	msize = len(M)
 	N = []
