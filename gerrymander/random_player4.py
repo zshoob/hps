@@ -123,7 +123,7 @@ def show(sol,M):
 	vs.draw_partitions(D)
 	
 n = 3
-k = 7
+k = 5
 M = read_input( )
 mapsize = len(M)
 pcells = populated_areas(M)	
@@ -137,7 +137,7 @@ while score >= 1.08:
 	print '\t' +  str(sigma_gen.next( ))
 	pop = sorted(pop, key = lambda sol: evaluate(sol,M,pcells))
 	score = evaluate(pop[0],M,pcells)
-	print [evaluate(sol,M,pcells) for sol in pop]
+	print score
 	#for p in pop:
 	#	print p
 	if score < minscore:
