@@ -76,16 +76,45 @@ def write_solution(D):
   out.write(str(D[-1][-1]) + '\n')
   out.close( )
 
+def verify_continuous(N, k):
+  width = len(N)
+  T = [[0 for x in xrange(width)] for x in xrange(width)]
+  li = range(0, k)
+  print li
+  for row in range(width - 1):
+    for col in range(width - 1):
+      if T[row][col] == 0:
+        value = N[row][col]
+        if(li.count(int(value)) == 0):
+          print [row, col, value]
+          return False
+        queue = []
+        queue.append([row, col])
+        T[row][col] = 1
+        while queue:
+          r, c = queue.pop(0)
+          if r >= 1 and N[r - 1][c] == value and T[r-1][c] == 0:
+            queue.append([r - 1, c])
+            T[r - 1][c] = 1
+          if r < width - 1 and N[r + 1][c] == value and T[r+1][c] == 0:
+            queue.append([r + 1, c])
+            T[r + 1][c] = 1
+          if c >= 1 and N[r][c - 1] == value and T[r][c - 1] == 0:
+            queue.append([r, c - 1])
+            T[r][c - 1] = 1
+          if c < width - 1 and N[r][c + 1] == value and T[r][c+1] == 0:
+            queue.append([r, c + 1])
+            T[r][c + 1] = 1
+        li.remove(int(value))
+  return True
+
+
+
+
 
 M = read_input_map()
 N = read_input_solution()
 print len(M)
-pop = get_population(M, N, 5)
-print len(pop)
-for p in pop:
-  print p
-print is_vary_beyond_range(pop, 0.02)
+width = len(N)
+print verify_continuous(N, 5)
 
-prop = get_election_prop(M, N, 5)
-D = get_election_result(N, prop)
-write_solution(D)
